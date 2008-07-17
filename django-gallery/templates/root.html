@@ -1,0 +1,14 @@
+{% extends "blog/base.html" %}
+{% block content %}
+
+<h1>Photo Gallery</h1>
+Click on a gallery title to view it's pictures
+<div id="gallery">
+	<ul>
+{% for object in dir_list %}
+<li><a href="/gallery/{{ object.id }}">{{ object.folder }}</a></li>
+{% endfor %}
+</ul>
+</div>
+
+{% endblock %}

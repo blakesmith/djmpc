@@ -1,0 +1,28 @@
+{% extends "blog/base.html" %}
+{% block title %}
+{% if caption %}
+	{{ caption }}
+{% else %}
+	Full Image
+{% endif %}
+{% endblock %}
+{% block content %}
+<div id="topnav"><img src="/site_media/images/backarrow.gif"><a href="/gallery/{{ id }}">Back to Gallery "{{ gal.dir }}"</a></div>
+
+<div id="gallery">
+    {% if image_exists %}
+        <div id="full"><center><a href="{{ original }}"><img src="{{ url }}"></a>	
+        {% if caption %}
+            <div id="full_caption">
+                    {% load markup %}
+                    {{ caption|markdown:"safe" }}</center>
+            </div>
+        {% endif %}
+    {% else %}
+        Image does not exist! Please navigate through the menu.
+    </div>
+
+	{% endif %}
+</div>
+
+{% endblock %}

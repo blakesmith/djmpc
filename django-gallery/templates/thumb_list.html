@@ -1,0 +1,13 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<h1>{{ dir }}</h1>
+<div id="topnav"><img src="/site_media/images/backarrow.gif"><a href="/gallery">Back to Gallery List</a></div>
+
+<div id="gallery">
+	{% for picture in piclist %}
+	<div class="thumbnail"><a href="/gallery/{{ id }}/{{ picture.id }}"><img src="{{ picture.url }}"></a></div>
+	<div class="clear">&nbsp;</div>
+	{% endfor %}
+</div>
+
+{% endblock %}
