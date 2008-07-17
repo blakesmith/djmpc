@@ -1,0 +1,8 @@
+My Django directory. These are all the apps I've written for my website
+djblithe.com - The blog app, gallery app, and all the templates that go
+with it. Other little features on my site such as my chat status,
+twitter status and such are mostly integrated into the
+templatetags/tag_includes.py under the blog directory. Eventually I'll
+move these to be seperate apps that can be merged in easily.
+
+-Blake

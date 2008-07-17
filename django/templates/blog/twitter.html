@@ -1,0 +1,13 @@
+<div class="tabbox">
+<div class="tabbanner">Twitter</div>
+<div class="tabcontent">
+<!-- Chat status -->
+{% if twitter_status %}
+{{ twitter_date|date:"F j, Y P" }}
+<table><tr><td><a href="http://twitter.com/blakesmith"><img src="/site_media/images/icon_twitter.png"></a></td>
+		<td>{{ twitter_status }}</td></tr></table>
+{% else %}
+Unable to parse twitter tweet!
+{% endif %}
+</div>
+</div>

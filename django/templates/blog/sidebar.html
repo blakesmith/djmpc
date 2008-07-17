@@ -1,0 +1,20 @@
+<div id="leftside">
+{% for cat in page_cat %}
+<div class="tabbox">
+<div class="tabbanner">{{ cat.name }}</div>
+<div class="tabcontent">
+<menu>
+{% for list in page_list %}
+{% ifequal list.category cat.name %}
+	{% if list.url %}
+<li><a href="{{ list.url }}">{{ list.short_title }}</a></li>
+	{% else %}
+<li><a href="{{ list.get_absolute_url }}">{{ list.title }}</a></li>
+	{% endif %}
+{% endifequal %}
+{% endfor %}
+</menu>
+</div>
+</div>
+{% endfor %}
+</div>

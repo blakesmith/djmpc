@@ -1,0 +1,22 @@
+{% extends "blog/base.html" %}
+{% block banner %}Page View{% endblock %}
+{% block title %}
+	{% for object in page_details %}
+	{{ object.title }}
+	{% endfor %}
+{% endblock %}
+
+{% block content %}
+
+{% load comments %}
+{% load markup %}
+{% for object in page_details %}
+	<div class="newsbox">
+	<h1>{{ object.title }}</h1>
+	<!-- Box content -->
+	{{ object.summary|markdown:"safe" }}
+	{{ object.content|markdown:"safe" }}
+</div>
+{% endfor %}
+<!-- End Box content -->
+{% endblock %}

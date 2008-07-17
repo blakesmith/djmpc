@@ -1,0 +1,20 @@
+<div class="tabbox">
+<div class="tabbanner">Chat</div>
+<div class="tabcontent">
+<!-- Chat status -->
+Chat status:
+<br>
+<img src='/site_media/images/aim.gif' alt='aim'>
+<img src='/site_media/images/jabber.gif' alt='jabber'>
+<img src='/site_media/images/yahoo.gif' alt='yahoo'>
+<img src='/site_media/images/msn.gif' alt='msn'>
+<img src='/site_media/images/icq.gif' alt='icq'>
+<img src='/site_media/images/irc.gif' alt='irc'>
+<br>
+{% if away_message %}
+<font color='red'>AWAY:</font> {{ away_message }}
+{% else %}
+<font color='green'>ONLINE</font>
+{% endif %}
+</div>
+</div>

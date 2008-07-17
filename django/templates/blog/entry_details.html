@@ -1,0 +1,38 @@
+{% extends "blog/base.html" %}
+{% block title %}
+	{% for object in entry_details %}
+	{{ object.title }}
+	{% endfor %}
+{% endblock %}
+{% block banner %}Entry View{% endblock %}
+{% block headline %}{% endblock %}
+
+{% block content %}
+
+{% load comments %}
+{% load comment_utils %}
+{% load markup %}
+{% for object in entry_details %}
+	<div class="newsbox">
+	<h1>{{ object.title }}</h1>
+	<div class="newsdate">Posted {{ object.date|date:"F j, Y" }}</div>
+	<!-- Box content -->
+	{{ object.summary|markdown:"safe" }}
+	{{ object.content|markdown:"safe" }}
+	<h2>Comments</h2>
+	{% get_free_comment_count for blog.entry object.id as comment_count %}
+	{% ifequal comment_count 0 %}
+		<i>No comments! Make one?</i>
+	{% else %}
+		{% get_public_free_comment_list for blog.entry object.id as comment_list %}
+		{% for comment in comment_list %}
+			<p><b>{{ comment.person_name|escape }}</b> commented, on {{ comment.submit_date|date:"F j, Y" }} at {{ comment.submit_date|date:"P" }}:</p>
+					{{ comment.comment|escape|urlizetrunc:40|linebreaks }}
+		{% endfor %}
+	{% endifequal %}
+        <h2>Post a comment</h2>
+        {% free_comment_form for blog.entry object.id %}
+</div>
+{% endfor %}
+<!-- End Box content -->
+{% endblock %}
