@@ -20,8 +20,9 @@ class Paddle(pygame.sprite.Sprite):
         self.moving = 0
         self.reset()
 
-    def segment_check(self):
-        self.bottom
+    def deflect(self):
+        self.deflect_angle = ((self.bottom - ball.center[1]) / 100.0)
+
     def reset(self):
         if self.player == 1:
             self.position_x = 560
