@@ -17,6 +17,7 @@ class Paddle(pygame.sprite.Sprite):
         self.width = 10
         self.color = white
         self.image = pygame.Surface([self.width, self.height])
+        self.window = pygame.display.get_surface()
         self.moving = 0
         self.reset()
 
@@ -37,10 +38,10 @@ class Paddle(pygame.sprite.Sprite):
             ball.offset_x = -ball.offset_x
         if self.moving == 1: #Check to see if paddle is moving.
             self.position_y += self.offset
-            if self.position_y >= 445:
-                self.position_y = 440
-            elif self.position_y <= 35:
-                self.position_y = 40
+            if self.position_y >= window_area.bottom:
+                self.position_y = window_area.bottom
+            elif self.position_y <= window_area.top:
+                self.position_y = window_area.top
             else:
                 self.rect.move_ip(0, self.offset)
 
@@ -57,9 +58,9 @@ class Ball(pygame.sprite.Sprite):
 
     def reset(self):
         self.offset_y = random.uniform(5, 6)
-        if self.serve == 2:
+        if self.serve == 2: #Player 2, serve goes the opposite direction
             self.offset_x = abs(self.offset_x) 
-        if self.serve == 1:
+        if self.serve == 1: #Player 1, goes normal direction/offset
             self.offset_x = -self.offset_x
         self.position_x = 320
         self.position_y = 40
