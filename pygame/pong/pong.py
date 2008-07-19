@@ -14,6 +14,7 @@ class Paddle(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.player = player
         self.height = 80
+        self.bisect = self.height / 2
         self.width = 10
         self.color = white
         self.image = pygame.Surface([self.width, self.height])
@@ -21,7 +22,12 @@ class Paddle(pygame.sprite.Sprite):
         self.reset()
 
     def deflect(self):
-        self.deflect_angle = ((self.bottom - ball.center[1]) / 100.0)
+        self.paddle_position = self.rect.bottom - ball.rect.center[1]
+        if (self.paddle_position > self.bisect):
+            self.deflect_angle = ((self.bisect - (self.paddle_position - self.bisect)) / 80.0) #Top half of the paddle, starts to decend from the halfway point down to 0.
+        else:
+            self.deflect_angle = ((self.paddle_position) / 80.0)
+	print self.deflect_angle
 
     def reset(self):
         if self.player == 1:
@@ -35,6 +41,7 @@ class Paddle(pygame.sprite.Sprite):
 
     def update(self):
         if (ball.rect.right == self.rect.left + ball.offset_x or ball.rect.left == self.rect.right + ball.offset_x) and ball.rect.colliderect(self.rect): #Ball hits the paddle , the ball.offset_x is to adjust for the fact that if the edges line up exactly at the same pixel coordination, they won't actually collide.
+            self.deflect()	
             ball.offset_x = -ball.offset_x
         if self.moving == 1: #Check to see if paddle is moving.
             self.position_y += self.offset
@@ -178,7 +185,7 @@ def key_check():
                 paddle2.moving = 0
 
 def draw():
-        clock.tick(100)
+        clock.tick(50)
         key_check()
         window.fill(black)
         score.render()
