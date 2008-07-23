@@ -14,7 +14,8 @@ class Paddle(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.player = player
         self.height = 80
-        self.bisect = self.height / 2
+        self.segments = 8
+        self.sect = (self.height / 2) / self.segments
         self.width = 10
         self.color = white
         self.image = pygame.Surface([self.width, self.height])
@@ -23,11 +24,13 @@ class Paddle(pygame.sprite.Sprite):
 
     def deflect(self):
         self.paddle_position = self.rect.bottom - ball.rect.center[1]
-        if (self.paddle_position > self.bisect):
-            self.deflect_angle = ((self.bisect - (self.paddle_position - self.bisect)) / 80.0) #Top half of the paddle, starts to decend from the halfway point down to 0.
-        else:
-            self.deflect_angle = ((self.paddle_position) / 80.0)
-	print self.deflect_angle
+        if self.paddle_position > (self.height / 2):
+            self.paddle_position = self.paddle_position - (self.paddle_position - (self.height / 2))
+#        for chunk in range(self.segments / 2 + 1)[1:]: 
+#            if self.paddle_position < (self.sect * chunk) and self.paddle_position > (self.sect * (chunk - 1)):
+#                self.deflect_angle = chunk
+#        print "%i, %i" % (self.paddle_position, self.deflect_angle)
+        print self.paddle_position
 
     def reset(self):
         if self.player == 1:
