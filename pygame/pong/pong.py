@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import pygame
 from pygame import *
 import random
@@ -16,23 +14,14 @@ class Paddle(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.player = player
         self.height = 80
-        self.segments = 8
-        self.sect = self.height / self.segments
         self.width = 10
         self.color = white
         self.image = pygame.Surface([self.width, self.height])
-        self.deflect_angle = 0
         self.moving = 0
         self.reset()
 
-    def deflect(self):
-        paddle_position = self.rect.bottom - ball.rect.center[1]
-        half_height = self.height / 2
-        if paddle_position > half_height:
-            paddle_position = half_height - (paddle_position - half_height)
-        self.deflect_angle = (self.segments / 2) - (paddle_position * .1) 
-        return self.deflect_angle
-
+    def segment_check(self):
+        self.bottom
     def reset(self):
         if self.player == 1:
             self.position_x = 560
@@ -45,7 +34,7 @@ class Paddle(pygame.sprite.Sprite):
 
     def update(self):
         if (ball.rect.right == self.rect.left + ball.offset_x or ball.rect.left == self.rect.right + ball.offset_x) and ball.rect.colliderect(self.rect): #Ball hits the paddle , the ball.offset_x is to adjust for the fact that if the edges line up exactly at the same pixel coordination, they won't actually collide.
-            ball.offset_x = -ball.offset_x * self.deflect()
+            ball.offset_x = -ball.offset_x
         if self.moving == 1: #Check to see if paddle is moving.
             self.position_y += self.offset
             if self.position_y >= 445:
@@ -188,7 +177,7 @@ def key_check():
                 paddle2.moving = 0
 
 def draw():
-        clock.tick(50)
+        clock.tick(100)
         key_check()
         window.fill(black)
         score.render()

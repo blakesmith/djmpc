@@ -5,29 +5,45 @@
 
 {% block content %}
 
-{% load comments %}
-{% load comment_utils %}
-{% load markup %}
-<div class="contentbody">
-Hey there! I'm glad you've found my site. It is a collaboration
-of my many ideas, projects, hobbies and otherwise assorted 
-nonsense. I don't pretend to be a genius when it comes to web-design,
-but I sure do enjoy having a little sandbox to play in. I also enjoy
-sharing neat software with people. I'm a big advocate of free
-software and believe that software is something that should be shared
-and collaborated on freely.</div>
+	{% load comments %}
+	{% load comment_utils %}
+	{% load markup %}
+	<div class="contentbody">
+	Hey there! I'm glad you've found my site. It is a collaboration
+	of my many ideas, projects, hobbies and otherwise assorted 
+	nonsense. I don't pretend to be a genius when it comes to web-design,
+	but I sure do enjoy having a little sandbox to play in. I also enjoy
+	sharing neat software with people. I'm a big advocate of free
+	software and believe that software is something that should be shared
+	and collaborated on freely.</div>
 
-<h1>Articles</h1>
+	<h1>Articles</h1>
 
-{% for object in entry_list %}
-    {% get_public_free_comment_count for blog.entry object.id as comment_count %}
-    <div class="newsbox">
-    <h2>{{ object.title }}</h2>
-    <div class="newsdate">Posted {{ object.date|date:"F j, Y" }}</div>
-    <!-- Box content -->
-    {{ object.summary|markdown:"safe" }}
-    <div class="newsdate"><a href="/entry/{{ object.id }}">Read More... {{ comment_count }} Comments.</a></div>
-    </div>
-    <!-- End Box content -->
-{% endfor %}
+	{% for object in entry_list %}
+	    {% get_public_free_comment_count for blog.entry object.id as comment_count %}
+	    <div class="newsbox">
+	    <h2>{{ object.title }}</h2>
+	    <div class="newsdate">Posted {{ object.date|date:"F j, Y" }}</div>
+	    <!-- Box content -->
+	    {{ object.summary|markdown:"safe" }}
+	    <div class="newsdate"><a href="/entry/{{ object.id }}">Read More... {{ comment_count }} Comments.</a></div>
+	    </div>
+	    <!-- End Box content -->
+	{% endfor %}
+		<br>
+		Displaying {{ entries_per_page }} of {{ num_entries }} blog entries.
+		<br>
+		{% if has_prev %} 
+			<a href="{{ prev_num }}">Previous Page</a> | 
+		{% endif %}
+		{% for i in page_list %}
+			{% if i.current_page %}
+				{{ i.page_num }} |
+			{% else %}
+				<a href="{{ i.href }}">{{ i.page_num }}</a> |
+			{% endif %}
+		{% endfor %}
+		{% if has_next %} 
+			<a href="{{ next_num }}">Next Page </a>
+		{% endif %}
 {% endblock %}

@@ -8,9 +8,6 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
-    class Admin:
-        pass
-
 class Entry(models.Model):
     title = models.CharField(max_length=50)
     summary = models.TextField()
@@ -28,9 +25,6 @@ class Entry(models.Model):
     
     def __str__(self):
         return self.title
-
-    class Admin:
-        pass
 
     class EntryModerator(CommentModerator):
         akismet = True
@@ -56,8 +50,6 @@ class Page(models.Model):
     def __str__(self):
         return self.title
 
-    class Admin:
-        pass
-
     def get_absolute_url(self):
         return "/page/%s" % self.short_title.lower()
+
