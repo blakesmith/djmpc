@@ -2,7 +2,7 @@ import re
 import os
 
 class CueRead(object):
-    """Main class to use when working with the library -> import cuesheet, cue = cuesheet.Cuesheet"""
+    """Main class to use when reading a cuesheet."""
     def __init__(self):
         self.cue_re = {
             'performer': 'PERFORMER \"(.*)\"',
@@ -25,19 +25,22 @@ class CueRead(object):
         return re.compile(reg).findall(string)
 
     def num_tracks(self):
-        return self.regcompile(self.cue_re['track'], self.sheet).__len__()
+        return len(self.regcompile(self.cue_re['track'], self.sheet))
 
     def parse(self):
         parsed = []
         for i in range(self.num_tracks()):
             temp = {}
+            index_list = []
             temp['performer'] = self.regcompile(self.cue_re['performer'], self.sheet)[1:][i] # Performer
             temp['title'] = self.regcompile(self.cue_re['title'], self.sheet)[1:][i] # Title
-            temp['track'] = self.regcompile(self.cue_re['track'], self.sheet)[i] # Track
-            temp['index'] = self.regcompile(self.cue_re['index'], self.sheet)[i] # Index
+            temp['track'] = int(self.regcompile(self.cue_re['track'], self.sheet)[i]) # Track
+            for j in self.regcompile(self.cue_re['index'], self.sheet)[i]:
+               index_list.append(int(j)) 
+            temp['index'] = index_list
             parsed.append(temp)
         return parsed
 
     def parse_pretty(self):
         for i in self.parse():
-            print "%s: %s - %s" % (i['track'], i['performer'], i['title'])
+            print "%i: %s - %s at %i:%i:%i" % (i['track'], i['performer'], i['title'], i['index'][0], i['index'][1], i['index'][2])
