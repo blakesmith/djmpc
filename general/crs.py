@@ -25,7 +25,7 @@ def restorescreen():
     curses.endwin()
 
 def main():
-    db.scrn = curses.initscr()
+    gb.scrn = curses.initscr()
     curses.noecho()
     curses.cbreak()
     curses.start_color()
