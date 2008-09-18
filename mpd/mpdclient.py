@@ -29,6 +29,7 @@ class MpdControl(object):
                 self.client.pause()
             else:
                 self.client.play()
+            self.client_disconnect()
         except:
             return "You aren't connected, you must connect first."
 
@@ -38,15 +39,34 @@ class MpdControl(object):
             print "%s - %s" % (status['artist'], status['title'])
         else:
             print "%s" % (status['file'])
+        self.client_disconnect()
+        
+class CueControl(object):
+
+    def __init__(self):
+        self.cue = cuesheet.CueRead()
+        self.music_directory = "/home/blake/.mpd/music"
+
+    def convert_index_to_seconds(self, index):
+        minutes = index[0] * 60
+        seconds = index[1]
+        miliseconds = index[2] / 100.0
+        return minutes + seconds + miliseconds
         
 def display_help():
     print "This is the standard help output that gets piped to stdout"
 
 if __name__ == "__main__":
-    if (len(sys.argv) == 1):
+    try:
         control = MpdControl()
         control.client_connect("localhost", 6600)
+    except:
+        print "Unable to connect to mpd server!"
+    if (len(sys.argv) == 1):
         control.song_info()
     else:
-        display_help()
-
+        if sys.argv[1] == 'play': control.client.play()
+        elif sys.argv[1] == 'pause': control.client.pause()
+        elif sys.argv[1] == 'toggle': control.toggle()
+        else:
+            display_help()
