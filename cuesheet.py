@@ -40,7 +40,3 @@ class CueRead(object):
             temp['index'] = index_list
             parsed.append(temp)
         return parsed
-
-    def parse_pretty(self):
-        for i in self.parse():
-            print "%i: %s - %s at %i:%i:%i" % (i['track'], i['performer'], i['title'], i['index'][0], i['index'][1], i['index'][2])

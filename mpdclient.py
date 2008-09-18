@@ -38,15 +38,13 @@ class MpdControl(object):
     def song_info(self):
         current_song = self.client.currentsong()
         client_status = self.client.status()
-        if not self.cue_control: #Cuesheet object not loaded
-            self.cue_control = CueControl()
-        if self.cue_control.cue_load(current_song['file']): #Does a cuesheet exist for the currently playing file?
+        if self.cue_init():
             current_time = float(client_status['time'].rsplit(":")[0])
             for i in self.cue_control.cue_parsed:
                 if current_time <= self.cue_control.convert_index_to_seconds(i['index']):
                     break
-                current_song = "%s - %s" % (i['performer'], i['title'])
-            return current_song
+                cue_info = "%s - %s" % (i['performer'], i['title'])
+            return cue_info
         if current_song.has_key("artist") and current_song.has_key("title"):
             return "%s - %s" % (current_song['artist'], current_song['title'])
         elif current_song.has_key("name") and current_song.has_key("title"):
@@ -56,7 +54,23 @@ class MpdControl(object):
         else:
             return "Nothing playing"
         self.client_disconnect()
-        
+    
+    def cue_init(self):
+        current_song = self.client.currentsong()
+        if not self.cue_control: #Cuesheet object not loaded
+            self.cue_control = CueControl()
+            if self.cue_control.cue_load(current_song['file']): #Does a cuesheet exist for the currently playing file?
+                return True
+            else:
+                return False
+
+    def cue_list(self):
+        if self.cue_init():
+            for i in self.cue_control.cue_lib.parse():
+                print "%i: %s - %s at %i:%i:%i" % (i['track'], i['performer'], i['title'], i['index'][0], i['index'][1], i['index'][2])
+        else:
+            return "No cuesheet found for the current song"
+
 class CueControl(object):
 
     def __init__(self):
@@ -104,5 +118,6 @@ if __name__ == "__main__":
         if sys.argv[1] == 'play': control.client.play()
         elif sys.argv[1] == 'pause': control.client.pause()
         elif sys.argv[1] == 'toggle': control.toggle()
+        elif sys.argv[1] == 'cuelist': control.cue_list()
         else:
             display_help()
