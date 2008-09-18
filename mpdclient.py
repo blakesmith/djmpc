@@ -37,8 +37,10 @@ class MpdControl(object):
         status = self.client.currentsong()
         if status.has_key("artist") and status.has_key("title"):
             print "%s - %s" % (status['artist'], status['title'])
-        else:
+        elif status.has_key("file"):
             print "%s" % (status['file'])
+        else:
+            print "Nothing playing"
         self.client_disconnect()
         
 class CueControl(object):
