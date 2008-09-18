@@ -89,6 +89,18 @@ class MpdControl(object):
         else:
                 self.client.seek(current_id, int(CueControl().convert_index_to_seconds(int_split)))
 
+    def cue_seek(self, track_string):
+        current_id = self.client.currentsong()['id']
+        if self.cue_init():
+            try:
+                track_int = int(track_string)
+            except:
+                print "Not a valid track number!"
+            for i in self.cue_control.cue_parsed:
+                if int(i['track']) == track_int:
+                    self.client.seek(current_id, int(self.cue_control.convert_index_to_seconds(i['index'])))
+                    break
+
 class CueControl(object):
 
     def __init__(self):
@@ -139,5 +151,6 @@ if __name__ == "__main__":
         elif sys.argv[1] == 'cuelist': control.cue_list()
         elif sys.argv[1] == 'update': control.client.update()
         elif sys.argv[1] == 'seek': control.seek(sys.argv[2])
+        elif sys.argv[1] == 'cueseek': control.cue_seek(sys.argv[2])
         else:
             display_help()
