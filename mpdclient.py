@@ -69,7 +69,7 @@ class MpdControl(object):
             for i in self.cue_control.cue_lib.parse():
                 print "%i: %s - %s at %i:%i:%i" % (i['track'], i['performer'], i['title'], i['index'][0], i['index'][1], i['index'][2])
         else:
-            return "No cuesheet found for the current song"
+            print "No cuesheet found for the current song"
 
 class CueControl(object):
 
@@ -101,7 +101,7 @@ class CueControl(object):
             else:
                 return False #No cue file exists
         else:
-            return True #Cuesheet has already been loaded into self.cue_parsed
+            return False #Cuesheet has already been loaded into self.cue_parsed
         
 def display_help():
     print "This is the standard help output that gets piped to stdout"
