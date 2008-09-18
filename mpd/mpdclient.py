@@ -36,23 +36,37 @@ class MpdControl(object):
             return "You aren't connected, you must connect first."
 
     def song_info(self):
+        song_info = {}
         current_song = self.client.currentsong()
         client_status = self.client.status()
+        if client_status['repeat'] == "1":
+            client_repeat = "on"
+        else:
+            client_repeat = "off"
+        if client_status['random'] == "1":
+            client_random = "on"
+        else:
+            client_random = "off"
+        song_info['2'] = "state: %s bitrate: %s volume: %s" % (client_status['state'], client_status['bitrate'], client_status['volume'])
+        song_info['3'] = "random: %s repeat: %s" % (client_random, client_repeat)
         if self.cue_init():
             current_time = float(client_status['time'].rsplit(":")[0])
             for i in self.cue_control.cue_parsed:
                 if current_time <= self.cue_control.convert_index_to_seconds(i['index']):
                     break
-                cue_info = "%s - %s" % (i['performer'], i['title'])
-            return cue_info
+                cue_info = "[CUE Track %s.] %s - %s" % (i['track'], i['performer'], i['title'])
+            song_info['1'] = cue_info
         if current_song.has_key("artist") and current_song.has_key("title"):
-            return "%s - %s" % (current_song['artist'], current_song['title'])
+            song_info['0'] = "%s - %s" % (current_song['artist'], current_song['title'])
         elif current_song.has_key("name") and current_song.has_key("title"):
-            return "%s - %s" % (current_song['name'], current_song['title'])
+            song_info['0'] = "%s - %s" % (current_song['name'], current_song['title'])
         elif current_song.has_key("file"):
-            return "%s" % (current_song['file'])
+            song_info['0'] = "%s" % (current_song['file'])
         else:
-            return "Nothing playing"
+            print "Nothing playing"
+        for i in song_info.itervalues():
+            print i
+
         self.client_disconnect()
     
     def cue_init(self):
@@ -110,6 +124,16 @@ class MpdControl(object):
             self.client_disconnect()
         except:
             return "You aren't connected, you must connect first."
+
+    def repeat(self):
+        try:
+            if self.client.status()['repeat'] == "1":
+                self.client.repeat(0)
+            else:
+                self.client.repeat(1)
+            self.client_disconnect()
+        except:
+            return "You aren't connected, you must connect first."
         
 
 class CueControl(object):
@@ -154,7 +178,7 @@ if __name__ == "__main__":
     except:
         print "Unable to connect to mpd server!"
     if (len(sys.argv) == 1):
-        print control.song_info()
+        control.song_info()
     else:
         if sys.argv[1] == 'play': control.client.play()
         elif sys.argv[1] == 'pause': control.client.pause()
@@ -162,6 +186,7 @@ if __name__ == "__main__":
         elif sys.argv[1] == 'cuelist': control.cue_list()
         elif sys.argv[1] == 'update': control.client.update()
         elif sys.argv[1] == 'random': control.random()
+        elif sys.argv[1] == 'repeat': control.repeat()
         elif sys.argv[1] == 'seek': control.seek(sys.argv[2])
         elif sys.argv[1] == 'cueseek': control.cue_seek(sys.argv[2])
         else:
