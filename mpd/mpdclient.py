@@ -101,6 +101,17 @@ class MpdControl(object):
                     self.client.seek(current_id, int(self.cue_control.convert_index_to_seconds(i['index'])))
                     break
 
+    def random(self):
+        try:
+            if self.client.status()['random'] == "1":
+                self.client.random(0)
+            else:
+                self.client.random(1)
+            self.client_disconnect()
+        except:
+            return "You aren't connected, you must connect first."
+        
+
 class CueControl(object):
 
     def __init__(self):
@@ -150,6 +161,7 @@ if __name__ == "__main__":
         elif sys.argv[1] == 'toggle': control.toggle()
         elif sys.argv[1] == 'cuelist': control.cue_list()
         elif sys.argv[1] == 'update': control.client.update()
+        elif sys.argv[1] == 'random': control.random()
         elif sys.argv[1] == 'seek': control.seek(sys.argv[2])
         elif sys.argv[1] == 'cueseek': control.cue_seek(sys.argv[2])
         else:
