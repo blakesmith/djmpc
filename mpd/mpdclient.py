@@ -4,6 +4,7 @@ import mpd
 import cuesheet
 import sys
 import os
+from config import *
 
 class MpdControl(object):
     
@@ -11,10 +12,10 @@ class MpdControl(object):
         self.client = mpd.MPDClient()
         self.cue_control = False
 
-    def client_connect(self, address, port):
+    def client_connect(self):
         """Initialize the connection to the server."""
         try:
-            self.client.connect(address, port)
+            self.client.connect(mpd_address, mpd_port)
         except:
             return "Unable to connect to server, is the mpd backend running?"
 
@@ -94,7 +95,7 @@ def display_help():
 if __name__ == "__main__":
     try:
         control = MpdControl()
-        control.client_connect("localhost", 6600)
+        control.client_connect()
     except:
         print "Unable to connect to mpd server!"
     if (len(sys.argv) == 1):
