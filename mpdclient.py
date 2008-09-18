@@ -71,6 +71,24 @@ class MpdControl(object):
         else:
             print "No cuesheet found for the current song"
 
+    def seek(self, seek_string):
+        current_id = self.client.currentsong()['id']
+        try:
+            seek_string = int(seek_string)
+        except:
+            string_split = seek_string.rsplit(":")
+            if len(string_split) == 2:
+                string_split.append(0)
+                int_split = []
+                for i in string_split:
+                    int_split.append(int(i))
+            elif len(string_split) > 2:
+                print "Malformed seek time. Try 'minutes:seconds' or just 'seconds'"
+        if isinstance(seek_string, int):
+            self.client.seek(current_id, seek_string)
+        else:
+                self.client.seek(current_id, int(CueControl().convert_index_to_seconds(int_split)))
+
 class CueControl(object):
 
     def __init__(self):
@@ -119,5 +137,7 @@ if __name__ == "__main__":
         elif sys.argv[1] == 'pause': control.client.pause()
         elif sys.argv[1] == 'toggle': control.toggle()
         elif sys.argv[1] == 'cuelist': control.cue_list()
+        elif sys.argv[1] == 'update': control.client.update()
+        elif sys.argv[1] == 'seek': control.seek(sys.argv[2])
         else:
             display_help()
