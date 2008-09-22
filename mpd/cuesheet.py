@@ -5,9 +5,9 @@ class CueRead(object):
     """Main class to use when reading a cuesheet."""
     def __init__(self):
         self.cue_re = {
+            'track': 'TRACK (\d{1,3}) AUDIO',
             'performer': 'PERFORMER \"(.*)\"',
             'title': 'TITLE \"(.*)\"',
-            'track': 'TRACK (\d{1,3}) AUDIO',
             'index': 'INDEX \d{1,3} (\d{1,3}):(\d{1,2}):(\d{1,2})'
             }
 
@@ -30,13 +30,11 @@ class CueRead(object):
     def parse(self):
         parsed = []
         for i in range(self.num_tracks()):
-            temp = {}
-            index_list = []
-            temp['performer'] = self.regcompile(self.cue_re['performer'], self.sheet)[1:][i] # Performer
-            temp['title'] = self.regcompile(self.cue_re['title'], self.sheet)[1:][i] # Title
-            temp['track'] = int(self.regcompile(self.cue_re['track'], self.sheet)[i]) # Track
-            for j in self.regcompile(self.cue_re['index'], self.sheet)[i]:
-               index_list.append(int(j)) 
-            temp['index'] = index_list
-            parsed.append(temp)
+            parsed.append({}) #First append our blank dicts.
+        for each_re in self.cue_re.iteritems():
+            reg = self.regcompile(each_re[1], self.sheet)
+            if each_re[0] == 'title' or each_re[0] == 'performer': #Pop the first values, since these usually denote the overall title and performer
+                reg.pop(0)
+            for each_match, each_case in zip(reg, parsed):
+                each_case[each_re[0]] = each_match
         return parsed
