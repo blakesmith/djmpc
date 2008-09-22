@@ -4,6 +4,7 @@ import mpd
 import cuesheet
 import sys
 import os
+import math
 from config import *
 
 class MpdControl(object):
@@ -52,7 +53,7 @@ class MpdControl(object):
         if self.cue_init():
             current_time = float(client_status['time'].rsplit(":")[0])
             for i in self.cue_control.cue_parsed:
-                if current_time <= self.cue_control.convert_index_to_seconds(i['index']):
+                if current_time < self.cue_control.convert_index_to_seconds(i['index']):
                     break
                 cue_info = "[CUE Track %s.] %s - %s" % (i['track'], i['performer'], i['title'])
             song_info['1'] = cue_info
@@ -101,7 +102,7 @@ class MpdControl(object):
         if isinstance(seek_string, int):
             self.client.seek(current_id, seek_string)
         else:
-                self.client.seek(current_id, int(CueControl().convert_index_to_seconds(int_split)))
+            self.client.seek(current_id, CueControl().convert_index_to_seconds(int_split))
 
     def cue_seek(self, track_string):
         current_id = self.client.currentsong()['id']
@@ -111,8 +112,8 @@ class MpdControl(object):
             except:
                 print "Not a valid track number!"
             for i in self.cue_control.cue_parsed:
-                if int(i['track']) == track_int:
-                    self.client.seek(current_id, int(self.cue_control.convert_index_to_seconds(i['index'])))
+                if i['track'] == int(track_int):
+                    self.client.seek(current_id, self.cue_control.convert_index_to_seconds(i['index'])) #Add one so we actually hit the track we seek to.
                     break
 
     def random(self):
@@ -147,8 +148,8 @@ class CueControl(object):
     def convert_index_to_seconds(self, index):
         minutes = index[0] * 60
         seconds = index[1]
-        miliseconds = index[2] / 100.0
-        return minutes + seconds + miliseconds
+        miliseconds = math.ceil(index[2] / 100.0)
+        return int(minutes + seconds + miliseconds)
 
     def cue_load(self, path):
         if not self.cue_parsed: # Has a cuesheet been loaded into memory?
