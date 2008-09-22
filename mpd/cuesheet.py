@@ -21,18 +21,15 @@ class CueRead(object):
         except:
             print "Cannot open file, are you sure it's readable?"
 
-    def regcompile(self, reg, string):
-        return re.compile(reg).findall(string)
-
     def num_tracks(self):
-        return len(self.regcompile(self.cue_re['track'], self.sheet))
+        return len(re.compile(self.cue_re['track']).findall(self.sheet))
 
     def parse(self):
         parsed = []
         for i in range(self.num_tracks()):
             parsed.append({}) #First append our blank dicts.
         for each_re in self.cue_re.iteritems(): #Loop through all our regexp tests
-            reg = self.regcompile(each_re[1], self.sheet)
+            reg = re.compile(each_re[1]).findall(self.sheet)
             if each_re[0] == 'title' or each_re[0] == 'performer': #Pop the first values, since these usually denote the overall title and performer
                 reg.pop(0)
             for each_match, each_case in zip(reg, parsed): #Loop through all matches, and add each match to a corresponding dict.
