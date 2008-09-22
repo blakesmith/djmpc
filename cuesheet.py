@@ -36,5 +36,11 @@ class CueRead(object):
             if each_re[0] == 'title' or each_re[0] == 'performer': #Pop the first values, since these usually denote the overall title and performer
                 reg.pop(0)
             for each_match, each_case in zip(reg, parsed):
-                each_case[each_re[0]] = each_match
+                if each_re[0] == 'index':
+                    index_list = []
+                    for i in each_match:
+                        index_list.append(int(i))
+                    each_case[each_re[0]] = index_list
+                else:
+                    each_case[each_re[0]] = each_match
         return parsed
