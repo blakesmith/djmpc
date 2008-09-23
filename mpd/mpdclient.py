@@ -80,7 +80,7 @@ class MpdControl(object):
             else:
                 return False
         else:
-            return True
+            return False
 
     def cue_list(self):
         if self.cue_init():
