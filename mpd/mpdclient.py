@@ -5,6 +5,8 @@ import cuesheet
 import sys
 import os
 import math
+import curses
+import time
 from config import *
 
 class MpdControl(object):
@@ -48,25 +50,24 @@ class MpdControl(object):
             client_random = "on"
         else:
             client_random = "off"
-        song_info['2'] = "state: %s bitrate: %s volume: %s" % (client_status['state'], client_status['bitrate'], client_status['volume'])
-        song_info['3'] = "random: %s repeat: %s" % (client_random, client_repeat)
+        song_info['state'] = "state: %s bitrate: %s volume: %s" % (client_status['state'], client_status['bitrate'], client_status['volume'])
+        song_info['random'] = "random: %s repeat: %s" % (client_random, client_repeat)
         if self.cue_init():
             current_time = float(client_status['time'].rsplit(":")[0])
             for i in self.cue_control.cue_parsed:
                 if current_time < self.cue_control.convert_index_to_seconds(i['index']):
                     break
                 cue_info = "[CUE Track %s.] %s - %s" % (i['track'], i['performer'], i['title'])
-            song_info['1'] = cue_info
+            song_info['cue'] = cue_info
         if current_song.has_key("artist") and current_song.has_key("title"):
-            song_info['0'] = "%s - %s" % (current_song['artist'], current_song['title'])
+            song_info['song'] = "%s - %s" % (current_song['artist'], current_song['title'])
         elif current_song.has_key("name") and current_song.has_key("title"):
-            song_info['0'] = "%s - %s" % (current_song['name'], current_song['title'])
+            song_info['song'] = "%s - %s" % (current_song['name'], current_song['title'])
         elif current_song.has_key("file"):
-            song_info['0'] = "%s" % (current_song['file'])
+            song_info['song'] = "%s" % (current_song['file'])
         else:
             print "Nothing playing"
-        for i in song_info.itervalues():
-            print i
+        return song_info
 
         self.client_disconnect()
     
@@ -74,10 +75,12 @@ class MpdControl(object):
         current_song = self.client.currentsong()
         if not self.cue_control: #Cuesheet object not loaded
             self.cue_control = CueControl()
-            if self.cue_control.cue_load(current_song['file']): #Does a cuesheet exist for the currently playing file?
+            if self.cue_control.cue_load(current_song['file']): #Does a cuesheet exist for the currently playing file, if so, is it loaded?
                 return True
             else:
                 return False
+        else:
+            return True
 
     def cue_list(self):
         if self.cue_init():
@@ -114,6 +117,7 @@ class MpdControl(object):
             for i in self.cue_control.cue_parsed:
                 if i['track'] == int(track_int):
                     self.client.seek(current_id, self.cue_control.convert_index_to_seconds(i['index'])) #Add one so we actually hit the track we seek to.
+                    display_song_info()
                     break
 
     def random(self):
@@ -167,10 +171,31 @@ class CueControl(object):
             else:
                 return False #No cue file exists
         else:
-            return False #Cuesheet has already been loaded into self.cue_parsed
+            return True #Cuesheet has already been loaded into self.cue_parsed
         
+def display_song_info():
+    for i in control.song_info().itervalues():
+        print i
+
 def display_help():
     print "This is the standard help output that gets piped to stdout"
+
+def curses_gui(stdscr):
+    stdscr.refresh()
+    while True:
+        main_win = curses.newwin(200, 200, 0, 0)
+        if control.song_info().has_key('cue'):
+            main_win.addstr(1, 5, control.song_info()['cue'])
+        main_win.addstr(2, 5, control.song_info()['song'])
+        main_win.addstr(3, 5, control.song_info()['random'])
+        main_win.addstr(4, 5, control.song_info()['state'])
+       # if char == 'q':
+       #     break
+        main_win.refresh()
+        time.sleep(.5)
+
+
+
 
 if __name__ == "__main__":
     try:
@@ -179,11 +204,12 @@ if __name__ == "__main__":
     except:
         print "Unable to connect to mpd server!"
     if (len(sys.argv) == 1):
-        control.song_info()
+        display_song_info()
     else:
         if sys.argv[1] == 'play': control.client.play()
         elif sys.argv[1] == 'pause': control.client.pause()
         elif sys.argv[1] == 'toggle': control.toggle()
+        elif sys.argv[1] == 'nc': curses.wrapper(curses_gui)
         elif sys.argv[1] == 'cuelist': control.cue_list()
         elif sys.argv[1] == 'update': control.client.update()
         elif sys.argv[1] == 'random': control.random()
