@@ -1,6 +1,5 @@
 import re
 import os
-import math
 
 class CueRead(object):
     """Main class to use when reading a cuesheet."""
