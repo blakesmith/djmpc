@@ -67,6 +67,7 @@ class MpdControl(object):
             song_info['song'] = "%s" % (current_song['file'])
         else:
             print "Nothing playing"
+        song_info['percentage'] = "%s%%" % str(self.song_percentage())
         return song_info
 
         self.client_disconnect()
@@ -152,6 +153,13 @@ class MpdControl(object):
         except: 
             print "Not a valid volume range!"
 
+    def song_percentage(self):
+        time_status = self.client.status()['time']
+        current_time = float(time_status.rsplit(":")[0])
+        total_time = float(time_status.rsplit(":")[1])
+        return int((current_time / total_time) * 100)
+
+
 class CueControl(object):
 
     def __init__(self):
@@ -200,6 +208,7 @@ def curses_gui(stdscr):
         main_win.addstr(2, 5, control.song_info()['song'])
         main_win.addstr(3, 5, control.song_info()['random'])
         main_win.addstr(4, 5, control.song_info()['state'])
+        main_win.addstr(5, 5, control.song_info()['percentage'])
        # if char == 'q':
        #     break
         main_win.refresh()
