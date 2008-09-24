@@ -79,6 +79,8 @@ class MpdControl(object):
                 return True
             else:
                 return False
+        elif self.cue_control.cue_parsed:
+            return True
         else:
             return False
 
@@ -139,7 +141,16 @@ class MpdControl(object):
             self.client_disconnect()
         except:
             return "You aren't connected, you must connect first."
-        
+
+    def setvol(self, vol):
+        try:
+            vol = int(vol)
+            if vol < 0 or vol > 100:
+                print "Outside a valid volume range!"
+            else:
+                self.client.setvol(vol)
+        except: 
+            print "Not a valid volume range!"
 
 class CueControl(object):
 
@@ -214,6 +225,7 @@ if __name__ == "__main__":
         elif sys.argv[1] == 'update': control.client.update()
         elif sys.argv[1] == 'random': control.random()
         elif sys.argv[1] == 'repeat': control.repeat()
+        elif sys.argv[1] == 'volume': control.setvol(sys.argv[2])
         elif sys.argv[1] == 'seek': control.seek(sys.argv[2])
         elif sys.argv[1] == 'cueseek': control.cue_seek(sys.argv[2])
         else:
