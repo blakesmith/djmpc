@@ -34,7 +34,6 @@ class MpdControl(object):
                 self.client.pause()
             else:
                 self.client.play()
-            self.client_disconnect()
         except:
             return "You aren't connected, you must connect first."
 
@@ -50,8 +49,9 @@ class MpdControl(object):
             client_random = "on"
         else:
             client_random = "off"
-        song_info['state'] = "state: %s bitrate: %s volume: %s" % (client_status['state'], client_status['bitrate'], client_status['volume'])
+        song_info['state'] = "state: %s volume: %s" % (client_status['state'], client_status['volume'])
         song_info['random'] = "random: %s repeat: %s" % (client_random, client_repeat)
+        song_info['percentage'] = "%s%% - bitrate: %s" % (str(self.song_percentage()), client_status['bitrate'])
         if self.cue_init():
             current_time = float(client_status['time'].rsplit(":")[0])
             for i in self.cue_control.cue_parsed:
@@ -67,11 +67,8 @@ class MpdControl(object):
             song_info['song'] = "%s" % (current_song['file'])
         else:
             print "Nothing playing"
-        song_info['percentage'] = "%s%%" % str(self.song_percentage())
         return song_info
 
-        self.client_disconnect()
-    
     def cue_init(self):
         current_song = self.client.currentsong()
         if not self.cue_control: #Cuesheet object not loaded
