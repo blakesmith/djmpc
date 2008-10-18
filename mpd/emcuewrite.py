@@ -8,11 +8,11 @@ def do_parse(in_file, out_file):
         track_file = open(in_file, "r").read()
     except:
         print "Unable to open specified file, check the path."
-    track_file_split = re.compile("(.*) `(.*)' \(.*\)").findall(track_file)
+    track_file_split = re.compile("(.*) `(.*)'").findall(track_file)
     if not track_file_split:
-        track_file_split = re.compile("(.*) '(.*)' \(.*\)").findall(track_file)
+        track_file_split = re.compile("(.*) '(.*)'").findall(track_file)
     if not track_file_split:
-        track_file_split = re.compile("(.*) `(.*)` \(.*\)").findall(track_file)
+        track_file_split = re.compile("(.*) `(.*)`").findall(track_file)
     if not track_file_split:
         print "Unable to parse the text file, are you sure it's in the right format?"
     else:
