@@ -9,11 +9,11 @@ import curses
 import time
 from config import *
 
+
 class MpdControl(object):
     
     def __init__(self):
         self.client = mpd.MPDClient()
-        self.cue_control = False
 
     def client_connect(self):
         """Initialize the connection to the server."""
@@ -54,8 +54,8 @@ class MpdControl(object):
         song_info['percentage'] = "%s%% - bitrate: %s" % (str(self.song_percentage()), client_status['bitrate'])
         if self.cue_init():
             current_time = float(client_status['time'].rsplit(":")[0])
-            for i in self.cue_control.cue_parsed:
-                if current_time < self.cue_control.convert_index_to_seconds(i['index']):
+            for i in cue_control.cue_parsed:
+                if current_time < cue_control.convert_index_to_seconds(i['index']):
                     break
                 cue_info = "[CUE Track %s.] %s - %s" % (i['track'], i['performer'], i['title'])
             song_info['cue'] = cue_info
@@ -71,20 +71,16 @@ class MpdControl(object):
 
     def cue_init(self):
         current_song = self.client.currentsong()
-        if not self.cue_control: #Cuesheet object not loaded
-            self.cue_control = CueControl()
-            if self.cue_control.cue_load(current_song['file']): #Does a cuesheet exist for the currently playing file, if so, is it loaded?
-                return True
-            else:
-                return False
-        elif self.cue_control.cue_parsed:
+        if cue_control.cue_load(current_song['file']): #Does a cuesheet exist for the currently playing file, if so, is it loaded?
+            return True
+        if cue_control.cue_parsed: #Is something loaded into memory?
             return True
         else:
             return False
 
     def cue_list(self):
         if self.cue_init():
-            for i in self.cue_control.cue_lib.parse():
+            for i in cue_control.cue_lib.parse():
                 print "%i: %s - %s at %i:%i:%i" % (i['track'], i['performer'], i['title'], i['index'][0], i['index'][1], i['index'][2])
         else:
             print "No cuesheet found for the current song"
@@ -114,9 +110,9 @@ class MpdControl(object):
                 track_int = int(track_string)
             except:
                 print "Not a valid track number!"
-            for i in self.cue_control.cue_parsed:
+            for i in cue_control.cue_parsed:
                 if i['track'] == int(track_int):
-                    self.client.seek(current_id, self.cue_control.convert_index_to_seconds(i['index'])) #Add one so we actually hit the track we seek to.
+                    self.client.seek(current_id, cue_control.convert_index_to_seconds(i['index'])) #Add one so we actually hit the track we seek to.
                     display_song_info()
                     break
 
@@ -155,6 +151,12 @@ class MpdControl(object):
         current_time = float(time_status.rsplit(":")[0])
         total_time = float(time_status.rsplit(":")[1])
         return int((current_time / total_time) * 100)
+
+    def track_has_changed(self):
+        if control.client.currentsong()['file'] == control.current_track_check:
+            return False
+        else:
+            return True
 
 
 class CueControl(object):
@@ -198,7 +200,13 @@ def display_help():
 
 def curses_gui(stdscr):
     stdscr.refresh()
+    curses.cbreak()
+    curses.halfdelay(1)
+    control.current_track_check = control.client.currentsong()['file']
     while True:
+        if control.track_has_changed():
+            cue_control.cue_parsed = False #unload cuesheet
+        control.current_track_check = control.client.currentsong()['file']
         main_win = curses.newwin(200, 200, 0, 0)
         if control.song_info().has_key('cue'):
             main_win.addstr(1, 5, control.song_info()['cue'])
@@ -206,16 +214,16 @@ def curses_gui(stdscr):
         main_win.addstr(3, 5, control.song_info()['random'])
         main_win.addstr(4, 5, control.song_info()['state'])
         main_win.addstr(5, 5, control.song_info()['percentage'])
-       # if char == 'q':
-       #     break
+        char = stdscr.getch()
+        if char == ord('q'):
+            break
+        if char == ord('t'):
+            control.toggle()     
         main_win.refresh()
-        time.sleep(.5)
-
-
-
 
 if __name__ == "__main__":
     try:
+        cue_control = CueControl()
         control = MpdControl()
         control.client_connect()
     except:
