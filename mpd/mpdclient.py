@@ -196,8 +196,8 @@ class CueControl(object):
     def __init__(self):
         self.cue_lib = cuesheet.CueRead()
         self.cue_parsed = False
-        self.music_directory = "/home/blake/.mpd/music/"
-        self.cue_directory = "/home/blake/cues/"
+        self.music_directory = music_directory
+        self.cue_directory = cue_directory
 
     def convert_index_to_seconds(self, index):
         """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
@@ -245,12 +245,12 @@ class CursesControl(object):
         main_win.refresh()
 
     def user_input(self, char):
-        """Handles all user input, and it's associated action. Returns True to quit the program. Returns 'update' to force a screen refresh."""
+        """Handles all user input, and it's associated action. Returns the associated action for the input."""
         if char == ord('q'):
-            return True
+            return "quit"
         if char == ord('t'):
             control.toggle()     
-            return False
+            return "update"
 
 def display_song_info():
     """Pretty output of song_info()."""
@@ -274,7 +274,7 @@ def curses_gui(stdscr):
         curses_control.status_check()
         curses_control.window_draw()
         user_input = curses_control.user_input(stdscr.getch())
-        if user_input:
+        if user_input == "quit":
             break
         elif user_input == "update":
             curses_control.window_draw()
