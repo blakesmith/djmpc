@@ -20,6 +20,7 @@ class MpdControl(object):
         control.current_status = control.client.status()
         if not control.server_is_stopped():
             control.current_song = control.client.currentsong()
+            control.track_current_time = cue_control.convert_seconds_to_index(self.time_split(self.current_status['time']))
 
     def client_connect(self):
         """Initialize the connection to the server."""
@@ -100,6 +101,7 @@ class MpdControl(object):
         """First tries to see if the input was able to be converted to an int. If that fails, try to seek using a time formated string
         (eg. '23:34'). If that fails, see if the input from the command line is properly formed. If it was able to convert to an int, 
         seek to that position."""
+        self.status_update()
         current_id = self.current_song['id']
         try:
             seek_string = int(seek_string)
@@ -119,7 +121,8 @@ class MpdControl(object):
 
     def cue_seek(self, track_string):
         """Seeks to a track number within a cue."""
-        current_id = self.client.currentsong()['id']
+        self.status_update()
+        current_id = self.current_song['id']
         if self.cue_init():
             try:
                 track_int = int(track_string)
@@ -130,6 +133,11 @@ class MpdControl(object):
                     self.client.seek(current_id, cue_control.convert_index_to_seconds(i['index'])) 
                     display_song_info()
                     break
+
+    def time_split(self, in_time):
+        """Takes a string input in the form "34:123", outputs the first number as an integer"""
+        out_time = in_time.rsplit(":")[0]
+        return out_time
 
     def random(self):
         """Enable or disable random."""
@@ -189,7 +197,6 @@ class MpdControl(object):
         else:
             return False
 
-
 class CueControl(object):
     """Object to control the functions associated with cuesheet reading."""
 
@@ -205,6 +212,17 @@ class CueControl(object):
         seconds = index[1]
         miliseconds = math.ceil(index[2] / 100.0)
         return int(minutes + seconds + miliseconds)
+
+    def convert_seconds_to_index(self, in_seconds):
+        """Takes total seconds and converts it to an index with type list."""
+        index = []
+        in_seconds = int(in_seconds)
+        minutes = in_seconds / 60
+        seconds = int(((in_seconds / 60.0) - minutes) * 60)
+        index.append(minutes)
+        index.append(seconds)
+        index.append(0)
+        return index
 
     def cue_load(self, path):
         """Handles the actual file handling of opening and storing the contents of the cuesheet in memory."""
@@ -230,8 +248,14 @@ class CursesControl(object):
     def status_check(self):
         """Things that need to be checked or updated each iteration of the GUI loop."""
         if control.track_has_changed():
-            cue_control.cue_parsed = False #unload cuesheet
+            self.track_check()
         control.status_update()
+    
+    def track_check(self):
+        """Things that need to be checked or updated if the track is switched."""
+        control.status_update()
+        cue_control.cue_parsed = False #unload cuesheet
+        control.track_total_time = cue_control.convert_seconds_to_index(control.current_song['time'])
 
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
@@ -242,6 +266,7 @@ class CursesControl(object):
         main_win.addstr(3, 5, control.song_info()['random'])
         main_win.addstr(4, 5, control.song_info()['state'])
         main_win.addstr(5, 5, control.song_info()['percentage'])
+        main_win.addstr(6, 5, "%i:%i / %i:%i" % (control.track_current_time[0], control.track_current_time[1], control.track_total_time[0], control.track_total_time[1]))
         main_win.refresh()
 
     def user_input(self, char):
@@ -267,9 +292,9 @@ def curses_gui(stdscr):
     curses_control = CursesControl()
     stdscr.refresh()
     curses.curs_set(0)
-    curses.cbreak()
-    curses.halfdelay(5)
+    curses.halfdelay(1)
     control.status_update()
+    control.track_total_time = cue_control.convert_seconds_to_index(control.current_song['time'])
     while True:
         curses_control.status_check()
         curses_control.window_draw()
