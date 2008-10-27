@@ -43,4 +43,4 @@ if __name__ == "__main__":
     elif len(sys.argv) == 3:
         do_parse(sys.argv[1], sys.argv[2])
     else:
-        print "You entered too many parameters, you only need to specify an input file."
+        print "You entered too many parameters, you only need to specify an input file and an output file."
