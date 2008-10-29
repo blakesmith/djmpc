@@ -227,9 +227,10 @@ class CueControl(object):
     def cue_load(self, path):
         """Handles the actual file handling of opening and storing the contents of the cuesheet in memory."""
         if not self.cue_parsed: # Has a cuesheet been loaded into memory?
-            path = "%s%s" % (path.rstrip(".mp3"), ".cue")
-            local = os.path.join(self.music_directory, path)
-            remote = os.path.join(self.cue_directory, path)
+            if path.endswith("mp3"):
+                path = "%s%s" % (path.rstrip("mp3"), "cue")
+                local = os.path.join(self.music_directory, path)
+                remote = os.path.join(self.cue_directory, path)
             if os.path.exists(local):
                 self.cue_lib.open(local)
                 self.cue_parsed = self.cue_lib.parse()
