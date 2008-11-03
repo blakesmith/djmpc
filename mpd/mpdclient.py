@@ -16,11 +16,16 @@ class MpdControl(object):
     def __init__(self):
         self.client = mpd.MPDClient()
 
+    def client_init(self):
+        self.status_update()
+        cue_control.cue_init()
+        self.track_total_time = cue_control.convert_seconds_to_index(control.current_song['time'])
+
     def status_update(self):
         control.current_status = control.client.status()
-        if not control.server_is_stopped():
-            control.current_song = control.client.currentsong()
-            control.track_current_time = cue_control.convert_seconds_to_index(self.time_split(self.current_status['time']))
+        if not self.server_is_stopped():
+            self.current_song = self.client.currentsong()
+            self.track_current_time = cue_control.convert_seconds_to_index(self.time_split(self.current_status['time']))
 
     def client_connect(self):
         """Initialize the connection to the server."""
@@ -46,52 +51,10 @@ class MpdControl(object):
         except:
             return "You aren't connected, you must connect first."
 
-    def song_info(self):
-        """Gathers all the current song info to be displayed as a dictionary. If a cuesheet exists, add that as well."""
-        song_info = {}
-        if self.current_status['repeat'] == "1":
-            client_repeat = "on"
-        else:
-            client_repeat = "off"
-        if self.current_status['random'] == "1":
-            client_random = "on"
-        else:
-            client_random = "off"
-        song_info['state'] = "state: %s volume: %s" % (self.current_status['state'], self.current_status['volume'])
-        song_info['random'] = "random: %s repeat: %s" % (client_random, client_repeat)
-        if self.server_is_stopped():
-           song_info['song'] = "Nothing playing."
-           song_info['percentage'] = ""
-           return song_info
-        song_info['percentage'] = "%s%% - bitrate: %s" % (str(self.song_percentage()), self.current_status['bitrate'])
-        if self.cue_init():
-            current_time = float(self.current_status['time'].rsplit(":")[0])
-            for i in cue_control.cue_parsed:
-                if current_time < cue_control.convert_index_to_seconds(i['index']):
-                    break
-                cue_info = "[CUE Track %s.] %s - %s" % (i['track'], i['performer'], i['title'])
-            song_info['cue'] = cue_info
-        if self.current_song.has_key("artist") and self.current_song.has_key("title"):
-            song_info['song'] = "%s - %s" % (self.current_song['artist'], self.current_song['title'])
-        elif self.current_song.has_key("name") and self.current_song.has_key("title"):
-            song_info['song'] = "%s - %s" % (self.current_song['name'], self.current_song['title'])
-        elif self.current_song.has_key("file"):
-            song_info['song'] = "%s" % (self.current_song['file'])
-        return song_info
-
-    def cue_init(self):
-        """Checks to see if a cuesheet has been loaded into memory already. If no, checks to see if the current track has a cuesheet visible in the filesystem. If so returns True. Otherwise returns false."""
-        if cue_control.cue_parsed: #Is something loaded into memory?
-            return True
-        if cue_control.cue_load(self.current_song['file']): #Does a cuesheet exist for the currently playing file, if so, is it loaded?
-            return True
-        else:
-            return False
-
     def cue_list(self):
         """Pretty printout of the current cuesheet. Invoked from the command line using 'cuelist'."""
-        control.status_update()
-        if self.cue_init():
+        self.client_init()
+        if cue_control.cue_init():
             for i in cue_control.cue_lib.parse():
                 print "%i: %s - %s at %i:%i:%i" % (i['track'], i['performer'], i['title'], i['index'][0], i['index'][1], i['index'][2])
         else:
@@ -101,7 +64,7 @@ class MpdControl(object):
         """First tries to see if the input was able to be converted to an int. If that fails, try to seek using a time formated string
         (eg. '23:34'). If that fails, see if the input from the command line is properly formed. If it was able to convert to an int, 
         seek to that position."""
-        self.status_update()
+        self.client_update()
         current_id = self.current_song['id']
         try:
             seek_string = int(seek_string)
@@ -121,9 +84,9 @@ class MpdControl(object):
 
     def cue_seek(self, track_string):
         """Seeks to a track number within a cue."""
-        self.status_update()
+        self.client_init()
         current_id = self.current_song['id']
-        if self.cue_init():
+        if cue_control.cue_init():
             try:
                 track_int = int(track_string)
             except:
@@ -172,16 +135,6 @@ class MpdControl(object):
         except: 
             print "Not a valid volume range!"
 
-    def song_percentage(self):
-        """Calculate and return the percentage of current track."""
-        time_status = self.current_status['time']
-        current_time = float(time_status.rsplit(":")[0])
-        total_time = float(time_status.rsplit(":")[1])
-        if total_time > 0:
-            return int((current_time / total_time) * 100)
-        else:
-            return 0
-
     def track_has_changed(self):
         """See if the playing track has ended and another has begun."""
         if not self.server_is_stopped():
@@ -196,6 +149,56 @@ class MpdControl(object):
             return True
         else:
             return False
+
+class SongInfo(object):
+    """Object to control all functions associated with song information."""
+
+    def gather_song_info(self):
+        """Gathers all the current song info to be displayed as a dictionary. If a cuesheet exists, add that as well."""
+        gathered_song_info = {}
+        if cue_control.cue_parsed:
+            cue_information = cue_control.cue_update()
+            gathered_song_info['1'] = "[CUE Track %s.] %s - %s" % (cue_information[0], cue_information[1], cue_information[2])
+        gathered_song_info['2'] = song_info.title_values()
+        gathered_song_info['3'] = "random: %s repeat: %s" % (song_info.random_status(), song_info.repeat_status())
+        gathered_song_info['4'] = "state: %s volume: %s" % (control.current_status['state'], control.current_status['volume'])
+        gathered_song_info['5'] = "%s%% - bitrate: %s" % (str(song_info.song_percentage()), control.current_status['bitrate'])
+        gathered_song_info['6'] = "%i:%i / %i:%i" % (control.track_current_time[0], control.track_current_time[1], control.track_total_time[0], control.track_total_time[1])
+        return gathered_song_info
+
+    def repeat_status(self):
+        if control.current_status['repeat'] == "1":
+             return "on"
+        else:
+             return "off"
+
+    def random_status(self):
+        if control.current_status['random'] == "1":
+            return "on"
+        else:
+            return "off"
+
+    def title_values(self):
+        """Depending on what ID3 information is available, print the relevant artist name and title."""
+        if control.server_is_stopped():
+            return "Nothing is playing."
+        if control.current_song.has_key("artist") and control.current_song.has_key("title"):
+            return "%s - %s" % (control.current_song['artist'], control.current_song['title'])
+        elif control.current_song.has_key("name") and control.current_song.has_key("title"):
+            return "%s - %s" % (control.current_song['name'], control.current_song['title'])
+        elif control.current_song.has_key("file"):
+            return "%s" % (control.current_song['file'])
+
+    def song_percentage(self):
+        """Calculate and return the percentage of current track."""
+        time_status = control.current_status['time']
+        current_time = float(time_status.rsplit(":")[0])
+        total_time = float(time_status.rsplit(":")[1])
+        if total_time > 0:
+            return int((current_time / total_time) * 100)
+        else:
+            return 0
+
 
 class CueControl(object):
     """Object to control the functions associated with cuesheet reading."""
@@ -224,6 +227,15 @@ class CueControl(object):
         index.append(0)
         return index
 
+    def cue_init(self):
+        """Checks to see if a cuesheet has been loaded into memory already. If no, checks to see if the current track has a cuesheet visible in the filesystem. If so returns True. Otherwise returns false."""
+        if self.cue_parsed: #Is something loaded into memory?
+            return True
+        if self.cue_load(control.current_song['file']): #Does a cuesheet exist for the currently playing file, if so, is it loaded?
+            return True
+        else:
+            return False
+
     def cue_load(self, path):
         """Handles the actual file handling of opening and storing the contents of the cuesheet in memory."""
         if not self.cue_parsed: # Has a cuesheet been loaded into memory?
@@ -243,6 +255,18 @@ class CueControl(object):
         else:
             return True #Cuesheet has already been loaded into self.cue_parsed
 
+    def cue_update(self):
+        """Function to be run every loop to see where the song is in the current cuesheet. Return the relevant information about the current location."""
+        if self.cue_parsed:
+            current_time = float(control.current_status['time'].rsplit(":")[0])
+            for i in cue_control.cue_parsed:
+                if current_time < cue_control.convert_index_to_seconds(i['index']):
+                    break
+                cue_info = (i['track'], i['performer'], i['title'])
+            return cue_info
+        else:
+            return "No cue has been loaded yet!"
+
 class CursesControl(object):
 
     def status_check(self):
@@ -254,19 +278,15 @@ class CursesControl(object):
     def track_check(self):
         """Things that need to be checked or updated if the track is switched."""
         control.status_update()
-        cue_control.cue_parsed = False #unload cuesheet
+        cue_control.cue_parsed = False #unload current cuesheet
+        cue_control.cue_init() #Recheck for a new cuesheet
         control.track_total_time = cue_control.convert_seconds_to_index(control.current_song['time'])
 
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
         main_win = curses.newwin(200, 200, 0, 0)
-        if control.song_info().has_key('cue'):
-            main_win.addstr(1, 5, control.song_info()['cue'])
-        main_win.addstr(2, 5, control.song_info()['song'])
-        main_win.addstr(3, 5, control.song_info()['random'])
-        main_win.addstr(4, 5, control.song_info()['state'])
-        main_win.addstr(5, 5, control.song_info()['percentage'])
-        main_win.addstr(6, 5, "%i:%i / %i:%i" % (control.track_current_time[0], control.track_current_time[1], control.track_total_time[0], control.track_total_time[1]))
+        for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info().itervalues()):
+            main_win.addstr(i+1, 5, j)
         main_win.refresh()
 
     def user_input(self, char):
@@ -279,8 +299,8 @@ class CursesControl(object):
 
 def display_song_info():
     """Pretty output of song_info()."""
-    control.status_update()
-    for i in control.song_info().itervalues():
+    control.client_init()
+    for i in song_info.gather_song_info().itervalues():
         print i
 
 def display_help():
@@ -293,8 +313,7 @@ def curses_gui(stdscr):
     stdscr.refresh()
     curses.curs_set(0)
     curses.halfdelay(1)
-    control.status_update()
-    control.track_total_time = cue_control.convert_seconds_to_index(control.current_song['time'])
+    control.client_init()
     while True:
         curses_control.status_check()
         curses_control.window_draw()
@@ -308,6 +327,7 @@ if __name__ == "__main__":
     try:
         cue_control = CueControl()
         control = MpdControl()
+        song_info = SongInfo()
         control.client_connect()
     except:
         print "Unable to connect to mpd server!"
