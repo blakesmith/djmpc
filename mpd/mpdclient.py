@@ -17,6 +17,7 @@ class MpdControl(object):
         self.client = mpd.MPDClient()
 
     def client_init(self):
+        """Things that should be loaded, started or run when the server first starts."""
         self.track_total_time = 0
         self.status_update()
         if not self.server_is_stopped():
@@ -24,6 +25,7 @@ class MpdControl(object):
             self.track_total_time = cue_control.convert_seconds_to_index(control.current_song['time'])
 
     def status_update(self):
+        """Current statuses that are updated each iteration of the main loop."""
         control.current_status = control.client.status()
         if not self.server_is_stopped():
             self.current_song = self.client.currentsong()
@@ -139,11 +141,20 @@ class MpdControl(object):
 
     def track_has_changed(self):
         """See if the playing track has ended and another has begun."""
-        if not self.server_is_stopped():
+        if self.track_has_started_or_stopped():
+            return True
+        elif not self.server_is_stopped():
             if control.client.currentsong()['file'] == control.current_song['file']:
                 return False
             else:
                 return True
+
+    def track_has_started_or_stopped(self):
+        """See if the user goes from the 'stop' state to the 'play' state, or visa-versa."""
+        if control.current_status['state'] == control.client.status()['state']:
+            return False
+        else:
+            return True
 
     def server_is_stopped(self):
         """Polls the server to see if it's stopped. If it is, return True, otherwise return False."""
