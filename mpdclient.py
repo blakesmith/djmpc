@@ -17,6 +17,7 @@ class MpdControl(object):
         self.client = mpd.MPDClient()
 
     def client_init(self):
+        self.track_total_time = 0
         self.status_update()
         if not self.server_is_stopped():
             cue_control.cue_init()
@@ -165,7 +166,8 @@ class SongInfo(object):
         gathered_song_info['4'] = "state: %s volume: %s" % (control.current_status['state'], control.current_status['volume'])
         if not control.server_is_stopped():
             gathered_song_info['5'] = "%s%% - bitrate: %s" % (str(song_info.song_percentage()), song_info.bitrate_status())
-            gathered_song_info['6'] = "%i:%i / %i:%i" % (control.track_current_time[0], control.track_current_time[1], control.track_total_time[0], control.track_total_time[1])
+            if control.track_total_time:
+                gathered_song_info['6'] = "%i:%i / %i:%i" % (control.track_current_time[0], control.track_current_time[1], control.track_total_time[0], control.track_total_time[1])
         return gathered_song_info
 
     def repeat_status(self):
