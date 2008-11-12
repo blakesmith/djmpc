@@ -198,7 +198,7 @@ class SongInfo(object):
         if not control.server_is_stopped():
             gathered_song_info['5'] = "%s%% - bitrate: %s" % (str(song_info.song_percentage()), song_info.bitrate_status())
             if control.track_total_time:
-                gathered_song_info['6'] = "%i:%i / %i:%i" % (control.track_current_time[0], control.track_current_time[1], control.track_total_time[0], control.track_total_time[1])
+                gathered_song_info['6'] = "%s:%s / %s:%s" % (control.track_current_time[0], cue_control.add_zeroes_to_time(control.track_current_time[1]), control.track_total_time[0], cue_control.add_zeroes_to_time(control.track_total_time[1]))
         return gathered_song_info
 
     def repeat_status(self):
@@ -265,6 +265,13 @@ class CueControl(object):
         minutes = in_seconds / 60
         seconds = in_seconds - (minutes * 60)
         return [minutes, seconds, 0]
+
+    def add_zeroes_to_time(self, in_seconds):
+        """Take a second integer and add the zeroes to make it look normal."""
+        if in_seconds < 10:
+            return "0%i" % in_seconds
+        else:
+            return str(in_seconds)
 
     def cue_init(self):
         """Checks to see if a cuesheet has been loaded into memory already. If no, checks to see if the current track has a cuesheet visible in the filesystem. If so returns True. Otherwise returns false."""
