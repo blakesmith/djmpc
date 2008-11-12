@@ -23,7 +23,7 @@ class MpdControl(object):
         self.status_update()
         if not self.server_is_stopped():
             cue_control.cue_init()
-            self.track_total_time = cue_control.convert_seconds_to_index(control.current_song['time'])
+            self.track_total_time = cue_control.cue_lib.convert_seconds_to_index(control.current_song['time'])
 
     def status_update(self):
         """Current statuses that are updated each iteration of the main loop."""
@@ -31,7 +31,7 @@ class MpdControl(object):
             control.current_status = control.client.status()
             if not self.server_is_stopped():
                 self.current_song = self.client.currentsong()
-                self.track_current_time = cue_control.convert_seconds_to_index(self.time_split(self.current_status['time']))
+                self.track_current_time = cue_control.cue_lib.convert_seconds_to_index(self.time_split(self.current_status['time']))
             return True
         except:
             return False
@@ -98,7 +98,7 @@ class MpdControl(object):
         if isinstance(seek_string, int):
             self.client.seek(current_id, seek_string)
         else:
-            self.client.seek(current_id, cue_control.convert_index_to_seconds(int_split))
+            self.client.seek(current_id, cue_control.cue_lib.convert_index_to_seconds(int_split))
 
     def cue_seek(self, track_string):
         """Seeks to a track number within a cue."""
@@ -111,7 +111,7 @@ class MpdControl(object):
                 print "Not a valid track number!"
             for i in cue_control.cue_parsed:
                 if i['track'] == int(track_int):
-                    self.client.seek(current_id, cue_control.convert_index_to_seconds(i['index'])) 
+                    self.client.seek(current_id, cue_control.cue_lib.convert_index_to_seconds(i['index'])) 
                     display_song_info()
                     break
 
@@ -252,20 +252,6 @@ class CueControl(object):
         self.music_directory = music_directory
         self.cue_directory = cue_directory
 
-    def convert_index_to_seconds(self, index):
-        """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
-        minutes = index[0] * 60
-        seconds = index[1]
-        miliseconds = math.ceil(index[2] / 100.0)
-        return int(minutes + seconds + miliseconds)
-
-    def convert_seconds_to_index(self, in_seconds):
-        """Takes total seconds and converts it to an index with type list."""
-        in_seconds = int(in_seconds)
-        minutes = in_seconds / 60
-        seconds = in_seconds - (minutes * 60)
-        return [minutes, seconds, 0]
-
     def add_zeroes_to_time(self, in_seconds):
         """Take a second integer and add the zeroes to make it look normal."""
         if in_seconds < 10:
@@ -308,7 +294,7 @@ class CueControl(object):
             if self.cue_parsed:
                 current_time = float(control.current_status['time'].rsplit(":")[0])
                 for i in cue_control.cue_parsed:
-                    if current_time < cue_control.convert_index_to_seconds(i['index']):
+                    if current_time < self.cue_lib.convert_index_to_seconds(i['index']):
                         break
                     cue_info = (i['track'], i['performer'], i['title'])
                 return cue_info
@@ -328,7 +314,7 @@ class CursesControl(object):
         control.status_update()
         cue_control.cue_parsed = False #unload current cuesheet
         cue_control.cue_init() #Recheck for a new cuesheet
-        control.track_total_time = cue_control.convert_seconds_to_index(control.current_song['time'])
+        control.track_total_time = cue_control.cue_lib.convert_seconds_to_index(control.current_song['time'])
 
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
@@ -348,7 +334,7 @@ class CursesControl(object):
 def display_song_info():
     """Pretty output of song_info()."""
     control.client_init()
-    for i in song_info.gather_song_info().itervalues():
+    for i in song_info.gather_song_info():
         print i
 
 def display_help():

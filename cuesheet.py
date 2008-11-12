@@ -1,5 +1,6 @@
 import re
 import os
+import math
 
 class CueRead(object):
     """Main class to use when reading a cuesheet."""
@@ -48,4 +49,18 @@ class CueRead(object):
         return parsed
 
     def calculate_song_length(self, index):
-        return index
+        return self.convert_index_to_seconds(index)
+
+    def convert_index_to_seconds(self, index):
+        """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
+        minutes = index[0] * 60
+        seconds = index[1]
+        miliseconds = math.ceil(index[2] / 100.0)
+        return int(minutes + seconds + miliseconds)
+
+    def convert_seconds_to_index(self, in_seconds):
+        """Takes total seconds and converts it to an index with type list."""
+        in_seconds = int(in_seconds)
+        minutes = in_seconds / 60
+        seconds = in_seconds - (minutes * 60)
+        return [minutes, seconds, 0]
