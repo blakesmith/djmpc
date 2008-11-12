@@ -9,6 +9,7 @@ import curses
 import time
 from config import *
 
+MAIN_LOOP_CYCLE_TIME = 1
 
 class MpdControl(object):
     """Main object to control mpd through the mpd library. Methods here are what interact directly with the server."""
@@ -356,7 +357,7 @@ def curses_gui(stdscr):
     curses_control = CursesControl()
     stdscr.refresh()
     curses.curs_set(0)
-    curses.halfdelay(1)
+    curses.halfdelay(MAIN_LOOP_CYCLE_TIME)
     control.client_init()
     while True:
         curses_control.status_check()
