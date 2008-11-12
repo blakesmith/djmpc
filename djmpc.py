@@ -196,9 +196,9 @@ class SongInfo(object):
         gathered_song_info['3'] = "random: %s repeat: %s" % (song_info.random_status(), song_info.repeat_status())
         gathered_song_info['4'] = "state: %s volume: %s" % (control.current_status['state'], control.current_status['volume'])
         if not control.server_is_stopped():
-            gathered_song_info['5'] = "%s%% - bitrate: %s" % (str(song_info.song_percentage()), song_info.bitrate_status())
+            gathered_song_info['5'] = "bitrate: %s" % song_info.bitrate_status()
             if control.track_total_time:
-                gathered_song_info['6'] = "%s:%s / %s:%s" % (control.track_current_time[0], cue_control.add_zeroes_to_time(control.track_current_time[1]), control.track_total_time[0], cue_control.add_zeroes_to_time(control.track_total_time[1]))
+                gathered_song_info['6'] = "%s:%s / %s:%s [%s%%]" % ( control.track_current_time[0], cue_control.add_zeroes_to_time(control.track_current_time[1]), control.track_total_time[0], cue_control.add_zeroes_to_time(control.track_total_time[1]), str(song_info.song_percentage()))
         return gathered_song_info
 
     def repeat_status(self):
