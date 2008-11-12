@@ -26,14 +26,14 @@ class CueRead(object):
         return len(re.compile(self.cue_re['track']).findall(self.sheet))
 
     def parse(self):
-        parsed = []
+        self.parsed = []
         for i in range(self.num_tracks()):
-            parsed.append({}) #First append our blank dicts.
+            self.parsed.append({}) #First append our blank dicts.
         for each_re in self.cue_re.iteritems(): #Loop through all our regexp tests
             reg = re.compile(each_re[1]).findall(self.sheet)
             if each_re[0] == 'title' or each_re[0] == 'performer': #Pop the first values, since these usually denote the overall title and performer
                 reg.pop(0)
-            for each_match, each_case in zip(reg, parsed): #Loop through all matches, and add each match to a corresponding dict.
+            for each_match, each_case in zip(reg, self.parsed): #Loop through all matches, and add each match to a corresponding dict.
                 if each_re[0] == 'index':
                     index_list = []
                     for i in each_match:
@@ -44,12 +44,23 @@ class CueRead(object):
                 else:
                     each_case[each_re[0]] = each_match
         #Done populating data from the regexp, now add extra calculated values.
-        for track in parsed: #Populate the track dictionaries with their individual song length.
-            track['length'] = self.calculate_song_length(track['index'])
-        return parsed
+        indices = []
+        for track in self.parsed:
+            indices.append(track['index'])
+        self.calculate_song_length(indices) #Populate the track dictionaries with their individual song length.
+        return self.parsed
 
-    def calculate_song_length(self, index):
-        return self.convert_index_to_seconds(index)
+    def calculate_song_length(self, indices):
+        """Input a list of indecis, Populate the parsed data with track lengths."""
+        sum_track_seconds = 0
+        i = 0
+        for index in indices:
+            if i == self.num_tracks() - 1: 
+                break
+            preadd_track_seconds = sum_track_seconds
+            sum_track_seconds += self.convert_index_to_seconds(indices[i+1]) - preadd_track_seconds
+            self.parsed[i]['length'] = self.convert_seconds_to_index(sum_track_seconds - preadd_track_seconds)
+            i += 1
 
     def convert_index_to_seconds(self, index):
         """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
