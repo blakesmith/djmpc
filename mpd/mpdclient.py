@@ -26,17 +26,22 @@ class MpdControl(object):
 
     def status_update(self):
         """Current statuses that are updated each iteration of the main loop."""
-        control.current_status = control.client.status()
-        if not self.server_is_stopped():
-            self.current_song = self.client.currentsong()
-            self.track_current_time = cue_control.convert_seconds_to_index(self.time_split(self.current_status['time']))
+        try:
+            control.current_status = control.client.status()
+            if not self.server_is_stopped():
+                self.current_song = self.client.currentsong()
+                self.track_current_time = cue_control.convert_seconds_to_index(self.time_split(self.current_status['time']))
+            return True
+        except:
+            return False
 
     def client_connect(self):
         """Initialize the connection to the server."""
         try:
             self.client.connect(mpd_address, mpd_port)
+            return True
         except:
-            return "Unable to connect to server, is the mpd backend running?"
+            return False
 
     def client_disconnect(self):
         """Disconnect function."""
@@ -44,6 +49,14 @@ class MpdControl(object):
             self.client.disconnect()
         except:
             return "Can't disconnect, are you sure you're connected?"
+
+    def client_reconnect(self):
+        while not self.status_update():
+            try:
+                control.client_disconnect()
+                control.client_connect()
+            except:
+                control.client_connect()
 
     def toggle(self):
         """If the server is playing, pause it. If the server is paused, play it."""
@@ -144,17 +157,23 @@ class MpdControl(object):
         if self.track_has_started_or_stopped():
             return True
         elif not self.server_is_stopped():
-            if control.client.currentsong()['file'] == control.current_song['file']:
-                return False
-            else:
-                return True
+            try:
+                if control.client.currentsong()['file'] == control.current_song['file']:
+                    return False
+                else:
+                    return True
+            except:
+                control.client_reconnect() #Server has died
 
     def track_has_started_or_stopped(self):
         """See if the user goes from the 'stop' state to the 'play' state, or visa-versa."""
-        if control.current_status['state'] == control.client.status()['state']:
-            return False
-        else:
-            return True
+        try:
+            if control.current_status['state'] == control.client.status()['state']:
+                return False
+            else:
+                return True
+        except:
+            control.client_reconnect() #Server has died.
 
     def server_is_stopped(self):
         """Polls the server to see if it's stopped. If it is, return True, otherwise return False."""
@@ -353,7 +372,8 @@ if __name__ == "__main__":
         cue_control = CueControl()
         control = MpdControl()
         song_info = SongInfo()
-        control.client_connect()
+        while not control.client_connect():
+            time.sleep(1)
     except:
         print "Unable to connect to mpd server!"
     if (len(sys.argv) == 1):
