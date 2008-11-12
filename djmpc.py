@@ -188,17 +188,17 @@ class SongInfo(object):
 
     def gather_song_info(self):
         """Gathers all the current song info to be displayed as a dictionary. If a cuesheet exists, add that as well."""
-        gathered_song_info = {}
+        gathered_song_info = []
         if cue_control.cue_parsed:
             cue_information = cue_control.cue_update()
-            gathered_song_info['1'] = "[CUE Track %s.] %s - %s" % (cue_information[0], cue_information[1], cue_information[2])
-        gathered_song_info['2'] = song_info.title_values()
-        gathered_song_info['3'] = "random: %s repeat: %s" % (song_info.random_status(), song_info.repeat_status())
-        gathered_song_info['4'] = "state: %s volume: %s" % (control.current_status['state'], control.current_status['volume'])
+            gathered_song_info.append("[CUE Track %s.] %s - %s" % (cue_information[0], cue_information[1], cue_information[2]))
+        gathered_song_info.append(song_info.title_values())
+        gathered_song_info.append("random: %s repeat: %s" % (song_info.random_status(), song_info.repeat_status()))
+        gathered_song_info.append("state: %s volume: %s" % (control.current_status['state'], control.current_status['volume']))
         if not control.server_is_stopped():
-            gathered_song_info['5'] = "bitrate: %s" % song_info.bitrate_status()
+            gathered_song_info.append("bitrate: %s" % song_info.bitrate_status())
             if control.track_total_time:
-                gathered_song_info['6'] = "%s:%s / %s:%s [%s%%]" % ( control.track_current_time[0], cue_control.add_zeroes_to_time(control.track_current_time[1]), control.track_total_time[0], cue_control.add_zeroes_to_time(control.track_total_time[1]), str(song_info.song_percentage()))
+                gathered_song_info.append("%s:%s / %s:%s [%s%%]" % ( control.track_current_time[0], cue_control.add_zeroes_to_time(control.track_current_time[1]), control.track_total_time[0], cue_control.add_zeroes_to_time(control.track_total_time[1]), str(song_info.song_percentage())))
         return gathered_song_info
 
     def repeat_status(self):
@@ -333,7 +333,7 @@ class CursesControl(object):
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
         main_win = curses.newwin(200, 200, 0, 0)
-        for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info().itervalues()):
+        for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
             main_win.addstr(i+1, 5, j)
         main_win.refresh()
 
