@@ -9,7 +9,7 @@ import curses
 import time
 from config import *
 
-MAIN_LOOP_CYCLE_TIME = 1
+MAIN_LOOP_CYCLE_TIME = 2
 
 class MpdControl(object):
     """Main object to control mpd through the mpd library. Methods here are what interact directly with the server."""
