@@ -42,4 +42,10 @@ class CueRead(object):
                     each_case[each_re[0]] = int(each_match)
                 else:
                     each_case[each_re[0]] = each_match
+        #Done populating data from the regexp, now add extra calculated values.
+        for track in parsed: #Populate the track dictionaries with their individual song length.
+            track['length'] = self.calculate_song_length(track['index'])
         return parsed
+
+    def calculate_song_length(self, index):
+        return index
