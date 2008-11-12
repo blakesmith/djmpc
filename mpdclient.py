@@ -261,14 +261,10 @@ class CueControl(object):
 
     def convert_seconds_to_index(self, in_seconds):
         """Takes total seconds and converts it to an index with type list."""
-        index = []
         in_seconds = int(in_seconds)
         minutes = in_seconds / 60
-        seconds = int(((in_seconds / 60.0) - minutes) * 60)
-        index.append(minutes)
-        index.append(seconds)
-        index.append(0)
-        return index
+        seconds = in_seconds - (minutes * 60)
+        return [minutes, seconds, 0]
 
     def cue_init(self):
         """Checks to see if a cuesheet has been loaded into memory already. If no, checks to see if the current track has a cuesheet visible in the filesystem. If so returns True. Otherwise returns false."""
