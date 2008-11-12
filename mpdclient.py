@@ -68,7 +68,7 @@ class MpdControl(object):
         """First tries to see if the input was able to be converted to an int. If that fails, try to seek using a time formated string
         (eg. '23:34'). If that fails, see if the input from the command line is properly formed. If it was able to convert to an int, 
         seek to that position."""
-        self.client_update()
+        self.status_update()
         current_id = self.current_song['id']
         try:
             seek_string = int(seek_string)
@@ -84,7 +84,7 @@ class MpdControl(object):
         if isinstance(seek_string, int):
             self.client.seek(current_id, seek_string)
         else:
-            self.client.seek(current_id, CueControl().convert_index_to_seconds(int_split))
+            self.client.seek(current_id, cue_control.convert_index_to_seconds(int_split))
 
     def cue_seek(self, track_string):
         """Seeks to a track number within a cue."""
