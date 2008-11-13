@@ -279,10 +279,12 @@ class CueControl(object):
             if os.path.exists(local):
                 self.cue_lib.open(local)
                 self.cue_parsed = self.cue_lib.parse()
+                self.append_last_length()
                 return True
             elif os.path.exists(remote):
                 self.cue_lib.open(local)
                 self.cue_parsed = self.cue_lib.parse()
+                self.append_last_length()
                 return True
             else:
                 return False #No cue file exists
@@ -303,6 +305,12 @@ class CueControl(object):
                 return cue_info
             else:
                 return "No cue has been loaded yet!"
+
+    def append_last_length(self):
+        num_tracks = self.cue_lib.num_tracks()
+        track_time = int(control.current_song['time'])
+        last_index = self.cue_lib.convert_index_to_seconds(self.cue_parsed[num_tracks - 1]['index'])
+        self.cue_parsed[num_tracks - 1]['length'] = self.cue_lib.convert_seconds_to_index(track_time - last_index)
 
 class CursesControl(object):
 
