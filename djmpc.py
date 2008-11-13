@@ -73,8 +73,8 @@ class MpdControl(object):
         """Pretty printout of the current cuesheet. Invoked from the command line using 'cuelist'."""
         self.client_init()
         if cue_control.cue_init():
-            for i in cue_control.cue_lib.parse():
-                print "%i: %s - %s at %i:%i:%i" % (i['track'], i['performer'], i['title'], i['index'][0], i['index'][1], i['index'][2])
+            for i in cue_control.cue_parsed:
+                print "[%s:%s] %i: %s - %s at %s:%s:%s" % (i['length'][0], cue_control.add_zeroes_to_time(i['length'][1]), i['track'], i['performer'], i['title'], i['index'][0], cue_control.add_zeroes_to_time(i['index'][1]), cue_control.add_zeroes_to_time(i['index'][2]))
         else:
             print "No cuesheet found for the current song"
 
