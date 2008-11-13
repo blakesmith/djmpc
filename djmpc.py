@@ -192,6 +192,7 @@ class SongInfo(object):
         if cue_control.cue_parsed:
             cue_information = cue_control.cue_update()
             gathered_song_info.append("[CUE Track %s.] %s - %s" % (cue_information[0], cue_information[1], cue_information[2]))
+            gathered_song_info.append("%s:%s / %s:%s" % (cue_information[4][0], cue_control.add_zeroes_to_time(cue_information[4][1]), cue_information[3][0], cue_control.add_zeroes_to_time(cue_information[3][1])))
         gathered_song_info.append(song_info.title_values())
         gathered_song_info.append("random: %s repeat: %s" % (song_info.random_status(), song_info.repeat_status()))
         gathered_song_info.append("state: %s volume: %s" % (control.current_status['state'], control.current_status['volume']))
@@ -294,9 +295,11 @@ class CueControl(object):
             if self.cue_parsed:
                 current_time = float(control.current_status['time'].rsplit(":")[0])
                 for i in cue_control.cue_parsed:
-                    if current_time < self.cue_lib.convert_index_to_seconds(i['index']):
+                    current_index = self.cue_lib.convert_index_to_seconds(i['index'])
+                    if current_time < current_index:
                         break
-                    cue_info = (i['track'], i['performer'], i['title'])
+                    self.current_track_time = current_time - current_index
+                    cue_info = (i['track'], i['performer'], i['title'], i['length'], self.cue_lib.convert_seconds_to_index(self.current_track_time))
                 return cue_info
             else:
                 return "No cue has been loaded yet!"
