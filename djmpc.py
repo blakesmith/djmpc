@@ -191,9 +191,9 @@ class SongInfo(object):
         """Gathers all the current song info to be displayed as a dictionary. If a cuesheet exists, add that as well."""
         gathered_song_info = []
         if cue_control.cue_parsed:
-            cue_information = cue_control.cue_update()
-            gathered_song_info.append("[CUE Track %s.] %s - %s" % (cue_information[0], cue_information[1], cue_information[2]))
-            gathered_song_info.append("%s:%s / %s:%s" % (cue_information[4][0], cue_control.add_zeroes_to_time(cue_information[4][1]), cue_information[3][0], cue_control.add_zeroes_to_time(cue_information[3][1])))
+            self.cue_information = cue_control.cue_update()
+            gathered_song_info.append("[CUE Track %s.] %s - %s" % (self.cue_information[0], self.cue_information[1], self.cue_information[2]))
+            gathered_song_info.append("%s:%s / %s:%s" % (self.cue_information[4][0], cue_control.add_zeroes_to_time(self.cue_information[4][1]), self.cue_information[3][0], cue_control.add_zeroes_to_time(self.cue_information[3][1])))
         gathered_song_info.append(song_info.title_values())
         gathered_song_info.append("random: %s repeat: %s" % (song_info.random_status(), song_info.repeat_status()))
         gathered_song_info.append("state: %s volume: %s" % (control.current_status['state'], control.current_status['volume']))
@@ -324,6 +324,7 @@ class CursesControl(object):
         curses.curs_set(0)
         curses.halfdelay(MAIN_LOOP_CYCLE_TIME)
         curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLUE)
+        curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
         signal.signal(signal.SIGWINCH, signal_handler)
         self.info_win = curses.newwin(8, 200, 0, 0)
         self.progress_bar = curses.newwin(3, self.window_width, 9, 5)
@@ -374,7 +375,10 @@ class CursesControl(object):
     def draw_cue_list(self):
         if cue_control.cue_parsed:
             for track, i in zip(cue_control.cue_parsed, range(curses.LINES - 14)):
-                self.body_win.addstr(i+1, 1, "%s - %s" % (track['performer'], track['title']))
+                if track['track'] == song_info.cue_information[0]:
+                    self.body_win.addstr(i+1, 1, "%s - %s" % (track['performer'], track['title']), curses.color_pair(2))
+                else:
+                    self.body_win.addstr(i+1, 1, "%s - %s" % (track['performer'], track['title']))
         else:
             self.body_win.erase()
             self.body_win.box()
