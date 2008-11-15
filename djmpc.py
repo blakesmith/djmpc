@@ -318,6 +318,11 @@ class CueControl(object):
 
 class CursesControl(object):
 
+    def __init__(self):
+        self.info_win = curses.newwin(8, 200, 0, 0)
+        self.progress_bar = curses.newwin(2, 60, 9, 5)
+        self.progress_bar.box()
+
     def status_check(self):
         """Things that need to be checked or updated each iteration of the GUI loop."""
         if control.track_has_changed():
@@ -333,10 +338,11 @@ class CursesControl(object):
 
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
-        main_win = curses.newwin(200, 200, 0, 0)
+        self.info_win.erase()
         for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
-            main_win.addstr(i+1, 5, j)
-        main_win.refresh()
+            self.info_win.addstr(i+1, 5, j)
+        self.info_win.refresh()
+        self.progress_bar.refresh()
 
     def user_input(self, char):
         """Handles all user input, and it's associated action. Returns the associated action for the input."""
