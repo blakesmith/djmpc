@@ -7,6 +7,7 @@ import os
 import math
 import curses
 import time
+import signal
 from config import *
 
 MAIN_LOOP_CYCLE_TIME = 2
@@ -18,7 +19,7 @@ class MpdControl(object):
         self.client = mpd.MPDClient()
 
     def client_init(self):
-        """Things that should be loaded, started or run when the server first starts."""
+        """Things that should be loaded, started or run when the client first starts."""
         self.track_total_time = 0
         self.status_update()
         if not self.server_is_stopped():
@@ -319,9 +320,18 @@ class CueControl(object):
 class CursesControl(object):
 
     def __init__(self):
+        self.window_width = curses.COLS - 10
+        curses.curs_set(0)
+        curses.halfdelay(MAIN_LOOP_CYCLE_TIME)
+        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_RED)
+        signal.signal(signal.SIGWINCH, signal_handler)
         self.info_win = curses.newwin(8, 200, 0, 0)
-        self.progress_bar = curses.newwin(2, 60, 9, 5)
+        self.progress_bar = curses.newwin(3, self.window_width, 9, 5)
         self.progress_bar.box()
+        self.body_win = curses.newwin(curses.LINES - 12, self.window_width, 12, 5)
+        self.body_win.box()
+        self.progress_bar.addstr(1, 1, " ", curses.color_pair(1))
+        self.progress_bar.addstr(1, 2, " ", curses.color_pair(1))
 
     def status_check(self):
         """Things that need to be checked or updated each iteration of the GUI loop."""
@@ -339,10 +349,13 @@ class CursesControl(object):
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
         self.info_win.erase()
+        self.progress_bar.erase()
         for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
             self.info_win.addstr(i+1, 5, j)
+        self.draw_progress_bar()
         self.info_win.refresh()
         self.progress_bar.refresh()
+        self.body_win.refresh()
 
     def user_input(self, char):
         """Handles all user input, and it's associated action. Returns the associated action for the input."""
@@ -351,6 +364,11 @@ class CursesControl(object):
         if char == ord('t'):
             control.toggle()     
             return "update"
+
+    def draw_progress_bar(self):
+
+def signal_handler(n, frame):
+    curses_control = CursesControl()
 
 def display_song_info():
     """Pretty output of gather_song_info()."""
@@ -365,11 +383,9 @@ def display_help():
 def curses_gui(stdscr):
     """Master function for all curses control."""
     curses_control = CursesControl()
-    stdscr.refresh()
-    curses.curs_set(0)
-    curses.halfdelay(MAIN_LOOP_CYCLE_TIME)
     control.client_init()
     while True:
+        stdscr.refresh()
         curses_control.status_check()
         curses_control.window_draw()
         user_input = curses_control.user_input(stdscr.getch())
