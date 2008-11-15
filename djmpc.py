@@ -330,8 +330,6 @@ class CursesControl(object):
         self.progress_bar.box()
         self.body_win = curses.newwin(curses.LINES - 12, self.window_width, 12, 5)
         self.body_win.box()
-        self.progress_bar.addstr(1, 1, " ", curses.color_pair(1))
-        self.progress_bar.addstr(1, 2, " ", curses.color_pair(1))
 
     def status_check(self):
         """Things that need to be checked or updated each iteration of the GUI loop."""
@@ -351,6 +349,8 @@ class CursesControl(object):
         self.info_win.erase()
         for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
             self.info_win.addstr(i+1, 5, j)
+        self.progress_bar.erase()
+        self.progress_bar.box()
         self.draw_progress_bar()
         self.info_win.refresh()
         self.progress_bar.refresh()
@@ -365,7 +365,10 @@ class CursesControl(object):
             return "update"
 
     def draw_progress_bar(self):
-        pass
+        bar_length = self.window_width 
+        bar_fill_percentage = (song_info.song_percentage() / 100.0) * bar_length   
+        for i in range(int(bar_fill_percentage)):
+            self.progress_bar.addstr(1, i+1, " ", curses.color_pair(1))
 
 def signal_handler(n, frame):
     curses_control = CursesControl()
