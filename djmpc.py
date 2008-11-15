@@ -323,7 +323,7 @@ class CursesControl(object):
         self.window_width = curses.COLS - 10
         curses.curs_set(0)
         curses.halfdelay(MAIN_LOOP_CYCLE_TIME)
-        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_RED)
+        curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLUE)
         signal.signal(signal.SIGWINCH, signal_handler)
         self.info_win = curses.newwin(8, 200, 0, 0)
         self.progress_bar = curses.newwin(3, self.window_width, 9, 5)
