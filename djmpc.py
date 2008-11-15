@@ -349,7 +349,6 @@ class CursesControl(object):
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
         self.info_win.erase()
-        self.progress_bar.erase()
         for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
             self.info_win.addstr(i+1, 5, j)
         self.draw_progress_bar()
@@ -366,6 +365,7 @@ class CursesControl(object):
             return "update"
 
     def draw_progress_bar(self):
+        pass
 
 def signal_handler(n, frame):
     curses_control = CursesControl()
