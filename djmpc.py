@@ -203,18 +203,21 @@ class SongInfo(object):
         return gathered_song_info
 
     def repeat_status(self):
+        """Is repeat enabled?"""
         if control.current_status['repeat'] == "1":
              return "on"
         else:
              return "off"
 
     def random_status(self):
+        """Is random enabled?"""
         if control.current_status['random'] == "1":
             return "on"
         else:
             return "off"
 
     def bitrate_status(self):
+        """Poll for current bitrate."""
         if not control.server_is_stopped():
             return control.current_status['bitrate']
         else:
@@ -307,6 +310,7 @@ class CueControl(object):
                 return "No cue has been loaded yet!"
 
     def append_last_length(self):
+        """Since cuesheet.py can't provide the length of the last track, deduce it from the length of the song, and append it to the parsed cuesheet."""
         num_tracks = self.cue_lib.num_tracks()
         track_time = int(control.current_song['time'])
         last_index = self.cue_lib.convert_index_to_seconds(self.cue_parsed[num_tracks - 1]['index'])
@@ -343,7 +347,7 @@ class CursesControl(object):
             return "update"
 
 def display_song_info():
-    """Pretty output of song_info()."""
+    """Pretty output of gather_song_info()."""
     control.client_init()
     for i in song_info.gather_song_info():
         print i
