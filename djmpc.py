@@ -352,6 +352,7 @@ class CursesControl(object):
         self.progress_bar.erase()
         self.progress_bar.box()
         self.draw_progress_bar()
+        self.draw_cue_list()
         self.info_win.refresh()
         self.progress_bar.refresh()
         self.body_win.refresh()
@@ -369,6 +370,14 @@ class CursesControl(object):
         bar_fill_percentage = (song_info.song_percentage() / 100.0) * bar_length   
         for i in range(int(bar_fill_percentage)):
             self.progress_bar.addstr(1, i+1, " ", curses.color_pair(1))
+
+    def draw_cue_list(self):
+        if cue_control.cue_parsed:
+            for track, i in zip(cue_control.cue_parsed, range(curses.LINES - 14)):
+                self.body_win.addstr(i+1, 1, "%s - %s" % (track['performer'], track['title']))
+        else:
+            self.body_win.erase()
+            self.body_win.box()
 
 def signal_handler(n, frame):
     curses_control = CursesControl()
