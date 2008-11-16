@@ -377,7 +377,10 @@ class CursesControl(object):
 
     def draw_cue_list(self):
         if cue_control.cue_parsed:
-            for track, i in zip(cue_control.cue_parsed, range(self.window_length)):
+            start_position = 1
+            while song_info.cue_information[0] > start_position*self.window_length:
+                start_position += 1
+            for track, i in zip(cue_control.cue_parsed[(start_position-1)*self.window_length:start_position*self.window_length], range(self.window_length)):
                 cue_string = "[%s:%s] %s - %s" % (track['length'][0], cue_control.add_zeroes_to_time(track['length'][1]), track['performer'], track['title'])
                 if track['track'] == song_info.cue_information[0]:
                     self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2], curses.color_pair(2))
