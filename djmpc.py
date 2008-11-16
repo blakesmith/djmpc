@@ -353,6 +353,8 @@ class CursesControl(object):
         self.progress_bar.erase()
         self.progress_bar.box()
         self.draw_progress_bar()
+        self.body_win.erase()
+        self.body_win.box()
         self.draw_cue_list()
         self.info_win.refresh()
         self.progress_bar.refresh()
@@ -376,9 +378,9 @@ class CursesControl(object):
         if cue_control.cue_parsed:
             for track, i in zip(cue_control.cue_parsed, range(curses.LINES - 14)):
                 if track['track'] == song_info.cue_information[0]:
-                    self.body_win.addstr(i+1, 1, "%s - %s" % (track['performer'], track['title']), curses.color_pair(2))
+                    self.body_win.addstr(i+1, 1, "[%s:%s] %s - %s" % (track['length'][0], cue_control.add_zeroes_to_time(track['length'][1]), track['performer'], track['title']), curses.color_pair(2))
                 else:
-                    self.body_win.addstr(i+1, 1, "%s - %s" % (track['performer'], track['title']))
+                    self.body_win.addstr(i+1, 1, "[%s:%s] %s - %s" % (track['length'][0], cue_control.add_zeroes_to_time(track['length'][1]), track['performer'], track['title']))
         else:
             self.body_win.erase()
             self.body_win.box()
