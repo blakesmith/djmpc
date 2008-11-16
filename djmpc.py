@@ -382,9 +382,6 @@ class CursesControl(object):
                     self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2], curses.color_pair(2))
                 else:
                     self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2])
-        else:
-            self.body_win.erase()
-            self.body_win.box()
 
 def signal_handler(n, frame):
     curses_control = CursesControl()
