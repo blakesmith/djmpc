@@ -370,7 +370,7 @@ class CursesControl(object):
             return "update"
 
     def draw_progress_bar(self):
-        bar_length = self.window_width 
+        bar_length = self.window_width - 1
         bar_fill_percentage = (song_info.song_percentage() / 100.0) * bar_length   
         for i in range(int(bar_fill_percentage)):
             self.progress_bar.addstr(1, i+1, " ", curses.color_pair(1))
