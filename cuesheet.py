@@ -87,10 +87,24 @@ class Index(object):
                 raise Exception("Index needs to be length 3: [minutes, seconds, frames]")
 
     def __sub__(self, other):
-        return Index([self.value[0] - other[0], self.value[1] - other[1], self.value[2] - other[2]])
+        sub_value = self.value
+        for i in range(3)[1:]:
+            if (sub_value[i] - other[i]) < 0:
+                sub_value[i] += 60
+                sub_value[i-1] -= 1
+        return self([sub_value[0] - other[0], sub_value[1] - other[1], sub_value[2] - other[2]])
 
     def __add__(self, other):
-        return Index([self.value[0] + other[0], self.value[1] + other[1], self.value[2] + other[2]])
+        sub_value = self.value
+        for i in range(3)[1:]:
+            if i == 2: 
+                test_amount = 75
+            else: 
+                test_amount = 60
+            if (sub_value[i] + other[i]) > test_amount:
+                sub_value[i] -= test_amount
+                sub_value[i-1] += 1
+        return self([sub_value[0] + other[0], sub_value[1] + other[1], sub_value[2] + other[2]])
 
     def __getitem__(self, index):
         return self.value[index]
