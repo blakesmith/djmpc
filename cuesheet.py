@@ -82,7 +82,7 @@ class Index(object):
         self.value = value
         if self.value:
             if not isinstance(self.value, list):
-                raise Exception("Index needs to be created with a list as input.")
+                raise Exception("Index needs to be created with a list with length 3 as input: [minutes, seconds, frames]")
             if len(self.value) != 3:
                 raise Exception("Index needs to be length 3: [minutes, seconds, frames]")
 
@@ -103,9 +103,9 @@ class Index(object):
 
     def __str__(self):
         if not self.value:
-            return "0:0:0" 
+            return "00:00:00" 
         else:
-            return "%s:%s:%s" % (self.value[0], self.value[1], self.value[2])
+            return "%s:%s:%s" % (self.value[0], self.add_zeroes(self.value[1]), self.add_zeroes(self.value[2]))
 
     def to_seconds(self):
         """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
@@ -113,3 +113,10 @@ class Index(object):
         seconds = self.value[1]
         miliseconds = math.ceil(self.value[2] / 100.0)
         return int(minutes + seconds + miliseconds)
+
+    def add_zeroes(self, in_seconds):
+        """Take a second integer and add the zeroes to make it look normal."""
+        if in_seconds < 10:
+            return "0%i" % in_seconds
+        else:
+            return str(in_seconds)
