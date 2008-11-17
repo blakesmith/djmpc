@@ -76,7 +76,7 @@ class CueRead(object):
         seconds = in_seconds - (minutes * 60)
         return [minutes, seconds, 0]
 
-class Index(list):
+class Index(object):
 
     def __init__(self, value = None):
         self.value = value
