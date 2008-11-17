@@ -89,10 +89,19 @@ class Index(list):
     def __sub__(self, other):
         return Index([self.value[0] - other[0], self.value[1] - other[1], self.value[2] - other[2]])
 
+    def __add__(self, other):
+        return Index([self.value[0] + other[0], self.value[1] + other[1], self.value[2] + other[2]])
+
     def __getitem__(self, index):
         return self.value[index]
     
     def __repr__(self):
+        if not self.value:
+            return "[]" 
+        else:
+            return "[%s, %s, %s]" % (self.value[0], self.value[1], self.value[2])
+
+    def __str__(self):
         if not self.value:
             return "0:0:0" 
         else:
