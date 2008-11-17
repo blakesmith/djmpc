@@ -75,3 +75,32 @@ class CueRead(object):
         minutes = in_seconds / 60
         seconds = in_seconds - (minutes * 60)
         return [minutes, seconds, 0]
+
+class Index(list):
+
+    def __init__(self, value = None):
+        self.value = value
+        if self.value:
+            if not isinstance(self.value, list):
+                raise Exception("Index needs to be created with a list as input.")
+            if len(self.value) != 3:
+                raise Exception("Index needs to be length 3: [minutes, seconds, frames]")
+
+    def __sub__(self, other):
+        return Index([self.value[0] - other[0], self.value[1] - other[1], self.value[2] - other[2]])
+
+    def __getitem__(self, index):
+        return self.value[index]
+    
+    def __repr__(self):
+        if not self.value:
+            return "0:0:0" 
+        else:
+            return "%s:%s:%s" % (self.value[0], self.value[1], self.value[2])
+
+    def to_seconds(self):
+        """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
+        minutes = self.value[0] * 60
+        seconds = self.value[1]
+        miliseconds = math.ceil(self.value[2] / 100.0)
+        return int(minutes + seconds + miliseconds)
