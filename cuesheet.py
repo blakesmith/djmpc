@@ -81,10 +81,18 @@ class Index(object):
     def __init__(self, value = None):
         self.value = value
         if self.value:
-            if not isinstance(self.value, list):
-                raise Exception("Index needs to be created with a list with length 3 as input: [minutes, seconds, frames]")
-            if len(self.value) != 3:
-                raise Exception("Index needs to be length 3: [minutes, seconds, frames]")
+            if isinstance(self.value, str):
+                try:
+                    self.value = int(self.value)
+                except:
+                    raise Exception("String not a valid integer!")
+            if isinstance(self.value, int):
+                minutes = self.value / 60
+                seconds = self.value - (minutes * 60)
+                self.value = [minutes, seconds, 0]
+            elif not (isinstance(self.value, list)) and (len(self.value) != 3):
+                raise Exception("Index needs to be created with a list with length 3 as input: [minutes, seconds, frames], or a second integer.")
+
 
     def __sub__(self, other):
         sub_values = [self.value[0] - other[0], self.value[1] - other[1], self.value[2] - other[2]]
