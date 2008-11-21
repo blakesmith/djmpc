@@ -24,7 +24,7 @@ class MpdControl(object):
         self.status_update()
         if not self.server_is_stopped():
             cue_control.cue_init()
-            self.track_total_time = cue_control.cue_lib.convert_seconds_to_index(control.current_song['time'])
+            self.track_total_time = cuesheet.Index(self.current_song['time'])
 
     def status_update(self):
         """Current statuses that are updated each iteration of the main loop."""
@@ -32,7 +32,7 @@ class MpdControl(object):
             control.current_status = control.client.status()
             if not self.server_is_stopped():
                 self.current_song = self.client.currentsong()
-                self.track_current_time = cue_control.cue_lib.convert_seconds_to_index(self.time_split(self.current_status['time']))
+                self.track_current_time = cuesheet.Index(self.time_split(self.current_status['time']))
             return True
         except:
             return False
@@ -75,7 +75,7 @@ class MpdControl(object):
         self.client_init()
         if cue_control.cue_init():
             for i in cue_control.cue_parsed:
-                print "[%s:%s] %i: %s - %s at %s:%s:%s" % (i['length'][0], cue_control.add_zeroes_to_time(i['length'][1]), i['track'], i['performer'], i['title'], i['index'][0], cue_control.add_zeroes_to_time(i['index'][1]), cue_control.add_zeroes_to_time(i['index'][2]))
+                print "[%s] %i: %s - %s at %s" % (i['length'], i['track'], i['performer'], i['title'], i['index'])
         else:
             print "No cuesheet found for the current song"
 
@@ -94,12 +94,13 @@ class MpdControl(object):
                 int_split = []
                 for i in string_split:
                     int_split.append(int(i))
+                int_split = cuesheet.Index(int_split)
             elif len(string_split) > 2:
                 print "Malformed seek time. Try 'minutes:seconds' or just 'seconds'"
         if isinstance(seek_string, int):
             self.client.seek(current_id, seek_string)
         else:
-            self.client.seek(current_id, cue_control.cue_lib.convert_index_to_seconds(int_split))
+            self.client.seek(current_id, int_split.to_seconds())
 
     def cue_seek(self, track_string):
         """Seeks to a track number within a cue."""
@@ -112,7 +113,7 @@ class MpdControl(object):
                 print "Not a valid track number!"
             for i in cue_control.cue_parsed:
                 if i['track'] == int(track_int):
-                    self.client.seek(current_id, cue_control.cue_lib.convert_index_to_seconds(i['index'])) 
+                    self.client.seek(current_id, i['index'].to_seconds()) 
                     display_song_info()
                     break
 
@@ -193,14 +194,14 @@ class SongInfo(object):
         if cue_control.cue_parsed:
             self.cue_information = cue_control.cue_update()
             gathered_song_info.append("[CUE Track %s.] %s - %s" % (self.cue_information[0], self.cue_information[1], self.cue_information[2]))
-            gathered_song_info.append("%s:%s / %s:%s" % (self.cue_information[4][0], cue_control.add_zeroes_to_time(self.cue_information[4][1]), self.cue_information[3][0], cue_control.add_zeroes_to_time(self.cue_information[3][1])))
+            gathered_song_info.append("%s / %s" % (self.cue_information[4], self.cue_information[3]))
         gathered_song_info.append(song_info.title_values())
         gathered_song_info.append("random: %s repeat: %s" % (song_info.random_status(), song_info.repeat_status()))
         gathered_song_info.append("state: %s volume: %s" % (control.current_status['state'], control.current_status['volume']))
         if not control.server_is_stopped():
             gathered_song_info.append("bitrate: %s" % song_info.bitrate_status())
             if control.track_total_time:
-                gathered_song_info.append("%s:%s / %s:%s [%s%%]" % ( control.track_current_time[0], cue_control.add_zeroes_to_time(control.track_current_time[1]), control.track_total_time[0], cue_control.add_zeroes_to_time(control.track_total_time[1]), str(song_info.song_percentage())))
+                gathered_song_info.append("%s / %s [%s%%]" % (control.track_current_time, control.track_total_time, str(song_info.song_percentage())))
         return gathered_song_info
 
     def repeat_status(self):
