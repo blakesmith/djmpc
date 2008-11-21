@@ -87,10 +87,24 @@ class Index(object):
                 raise Exception("Index needs to be length 3: [minutes, seconds, frames]")
 
     def __sub__(self, other):
-        return Index([self.value[0] - other[0], self.value[1] - other[1], self.value[2] - other[2]])
+        sub_values = [self.value[0] - other[0], self.value[1] - other[1], self.value[2] - other[2]]
+        if sub_values[2] < 0:
+            sub_values[1] -= 1
+            sub_values[2] += 75
+        if sub_values[1] < 0:
+            sub_values[0] -= 1
+            sub_values[1] += 60
+        return Index(sub_values)
 
     def __add__(self, other):
-        return Index([self.value[0] + other[0], self.value[1] + other[1], self.value[2] + other[2]])
+        added_values = [self.value[0] + other[0], self.value[1] + other[1], self.value[2] + other[2]]
+        if added_values[2] >= 75:
+            added_values[1] += 1
+            added_values[2] -= 75
+        if added_values[1] >= 60:
+            added_values[0] += 1
+            added_values[1] -= 60
+        return Index(added_values)
 
     def __getitem__(self, index):
         return self.value[index]
@@ -105,7 +119,7 @@ class Index(object):
         if not self.value:
             return "00:00:00" 
         else:
-            return "%s:%s:%s" % (self.value[0], self.add_zeroes(self.value[1]), self.add_zeroes(self.value[2]))
+            return "%s:%s" % (self.value[0], self.add_zeroes(self.value[1]))
 
     def to_seconds(self):
         """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
