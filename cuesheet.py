@@ -38,7 +38,7 @@ class CueRead(object):
                     index_list = []
                     for i in each_match:
                         index_list.append(int(i))
-                    each_case[each_re[0]] = index_list
+                    each_case[each_re[0]] = Index(index_list)
                 elif each_re[0] == 'track':
                     each_case[each_re[0]] = int(each_match)
                 else:
@@ -52,14 +52,14 @@ class CueRead(object):
 
     def calculate_song_length(self, indices):
         """Input a list of indecis, Populate the parsed data with track lengths."""
-        sum_track_seconds = 0
+        sum_total_index = Index([0, 0, 0])
         i = 0
         for index in indices:
             if i == self.num_tracks() - 1: 
                 break
-            preadd_track_seconds = sum_track_seconds
-            sum_track_seconds += self.convert_index_to_seconds(indices[i+1]) - preadd_track_seconds
-            self.parsed[i]['length'] = self.convert_seconds_to_index(sum_track_seconds - preadd_track_seconds)
+            preadd_track_index = sum_total_index
+            sum_total_index += indices[i+1] - preadd_track_index
+            self.parsed[i]['length'] = sum_total_index - preadd_track_index
             i += 1
 
     def convert_index_to_seconds(self, index):
