@@ -62,20 +62,6 @@ class CueRead(object):
             self.parsed[i]['length'] = sum_total_index - preadd_track_index
             i += 1
 
-    def convert_index_to_seconds(self, index):
-        """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
-        minutes = index[0] * 60
-        seconds = index[1]
-        miliseconds = math.ceil(index[2] / 100.0)
-        return int(minutes + seconds + miliseconds)
-
-    def convert_seconds_to_index(self, in_seconds):
-        """Takes total seconds and converts it to an index with type list."""
-        in_seconds = int(in_seconds)
-        minutes = in_seconds / 60
-        seconds = in_seconds - (minutes * 60)
-        return [minutes, seconds, 0]
-
 class Index(object):
 
     def __init__(self, value = None):
