@@ -258,13 +258,6 @@ class CueControl(object):
         self.music_directory = music_directory
         self.cue_directory = cue_directory
 
-    def add_zeroes_to_time(self, in_seconds):
-        """Take a second integer and add the zeroes to make it look normal."""
-        if in_seconds < 10:
-            return "0%i" % in_seconds
-        else:
-            return str(in_seconds)
-
     def cue_init(self):
         """Checks to see if a cuesheet has been loaded into memory already. If no, checks to see if the current track has a cuesheet visible in the filesystem. If so returns True. Otherwise returns false."""
         if not control.server_is_stopped():
