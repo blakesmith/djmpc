@@ -114,6 +114,24 @@ class Index(object):
             added_values[1] -= 60
         return Index(added_values)
 
+    def __lt__(self, other):
+        if (Index(self.value) - other).to_seconds("float") < 0:
+            return True
+        else:
+            return False
+
+    def __gt__(self, other):
+        if (Index(self.value) - other).to_seconds("float") > 0:
+            return True
+        else:
+            return False
+
+    def __eq__(self, other):
+        if (Index(self.value) - other).to_seconds("float") == 0:
+            return True
+        else:
+            return False
+
     def __getitem__(self, index):
         return self.value[index]
     
@@ -129,12 +147,15 @@ class Index(object):
         else:
             return "%s:%s" % (self.value[0], self.add_zeroes(self.value[1]))
 
-    def to_seconds(self):
+    def to_seconds(self, type="int"):
         """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
         minutes = self.value[0] * 60
         seconds = self.value[1]
-        miliseconds = math.ceil(self.value[2] / 100.0)
-        return int(minutes + seconds + miliseconds)
+        frames = self.value[2] / 75.0
+        if type == "int":
+            return int(minutes + seconds + frames)
+        if type == "float":
+            return minutes + seconds + frames
 
     def add_zeroes(self, in_seconds):
         """Take a second integer and add the zeroes to make it look normal."""
