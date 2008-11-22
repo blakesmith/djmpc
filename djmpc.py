@@ -300,13 +300,12 @@ class CueControl(object):
         """Function to be run every loop to see where the song is in the current cuesheet. Return the relevant information about the current location."""
         if not control.server_is_stopped():
             if self.cue_parsed:
-                current_time = float(control.current_status['time'].rsplit(":")[0])
                 for i in cue_control.cue_parsed:
-                    current_index = self.cue_lib.convert_index_to_seconds(i['index'])
-                    if current_time < current_index:
+                    current_index = i['index']
+                    if control.track_current_time < current_index:
                         break
-                    self.current_track_time = current_time - current_index
-                    cue_info = (i['track'], i['performer'], i['title'], i['length'], self.cue_lib.convert_seconds_to_index(self.current_track_time))
+                    self.current_track_time = control.track_current_time - current_index
+                    cue_info = (i['track'], i['performer'], i['title'], i['length'], self.current_track_time)
                 return cue_info
             else:
                 return "No cue has been loaded yet!"
@@ -315,8 +314,8 @@ class CueControl(object):
         """Since cuesheet.py can't provide the length of the last track, deduce it from the length of the song, and append it to the parsed cuesheet."""
         num_tracks = self.cue_lib.num_tracks()
         track_time = int(control.current_song['time'])
-        last_index = self.cue_lib.convert_index_to_seconds(self.cue_parsed[num_tracks - 1]['index'])
-        self.cue_parsed[num_tracks - 1]['length'] = self.cue_lib.convert_seconds_to_index(track_time - last_index)
+        last_index = self.cue_parsed[num_tracks - 1]['index'].to_seconds()
+        self.cue_parsed[num_tracks - 1]['length'] = cuesheet.Index(track_time - last_index)
 
 class CursesControl(object):
 
@@ -345,7 +344,7 @@ class CursesControl(object):
         control.status_update()
         cue_control.cue_parsed = False #unload current cuesheet
         cue_control.cue_init() #Recheck for a new cuesheet
-        control.track_total_time = cue_control.cue_lib.convert_seconds_to_index(control.current_song['time'])
+        control.track_total_time = cuesheet.Index(control.current_song['time'])
 
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
@@ -382,7 +381,7 @@ class CursesControl(object):
             while song_info.cue_information[0] > start_position*self.window_length:
                 start_position += 1
             for track, i in zip(cue_control.cue_parsed[(start_position-1)*self.window_length:start_position*self.window_length], range(self.window_length)):
-                cue_string = "[%s:%s] %s - %s" % (track['length'][0], cue_control.add_zeroes_to_time(track['length'][1]), track['performer'], track['title'])
+                cue_string = "[%s] %s - %s" % (track['length'], track['performer'], track['title'])
                 if track['track'] == song_info.cue_information[0]:
                     self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2], curses.color_pair(2))
                 else:
