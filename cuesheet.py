@@ -38,7 +38,7 @@ class CueRead(object):
                     index_list = []
                     for i in each_match:
                         index_list.append(int(i))
-                    each_case[each_re[0]] = index_list
+                    each_case[each_re[0]] = Index(index_list)
                 elif each_re[0] == 'track':
                     each_case[each_re[0]] = int(each_match)
                 else:
@@ -52,59 +52,71 @@ class CueRead(object):
 
     def calculate_song_length(self, indices):
         """Input a list of indecis, Populate the parsed data with track lengths."""
-        sum_track_seconds = 0
+        sum_total_index = Index([0, 0, 0])
         i = 0
         for index in indices:
             if i == self.num_tracks() - 1: 
                 break
-            preadd_track_seconds = sum_track_seconds
-            sum_track_seconds += self.convert_index_to_seconds(indices[i+1]) - preadd_track_seconds
-            self.parsed[i]['length'] = self.convert_seconds_to_index(sum_track_seconds - preadd_track_seconds)
+            preadd_track_index = sum_total_index
+            sum_total_index += indices[i+1] - preadd_track_index
+            self.parsed[i]['length'] = sum_total_index - preadd_track_index
             i += 1
-
-    def convert_index_to_seconds(self, index):
-        """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
-        minutes = index[0] * 60
-        seconds = index[1]
-        miliseconds = math.ceil(index[2] / 100.0)
-        return int(minutes + seconds + miliseconds)
-
-    def convert_seconds_to_index(self, in_seconds):
-        """Takes total seconds and converts it to an index with type list."""
-        in_seconds = int(in_seconds)
-        minutes = in_seconds / 60
-        seconds = in_seconds - (minutes * 60)
-        return [minutes, seconds, 0]
 
 class Index(object):
 
     def __init__(self, value = None):
         self.value = value
         if self.value:
-            if not isinstance(self.value, list):
-                raise Exception("Index needs to be created with a list with length 3 as input: [minutes, seconds, frames]")
-            if len(self.value) != 3:
-                raise Exception("Index needs to be length 3: [minutes, seconds, frames]")
+            if isinstance(self.value, str):
+                try:
+                    self.value = int(self.value)
+                except:
+                    raise Exception("String not a valid integer!")
+            if isinstance(self.value, int):
+                minutes = self.value / 60
+                seconds = self.value - (minutes * 60)
+                self.value = [minutes, seconds, 0]
+            elif not (isinstance(self.value, list)) and (len(self.value) != 3):
+                raise Exception("Index needs to be created with a list with length 3 as input: [minutes, seconds, frames], or a second integer.")
+
 
     def __sub__(self, other):
-        sub_value = self.value
-        for i in range(3)[1:]:
-            if (sub_value[i] - other[i]) < 0:
-                sub_value[i] += 60
-                sub_value[i-1] -= 1
-        return self([sub_value[0] - other[0], sub_value[1] - other[1], sub_value[2] - other[2]])
+        sub_values = [self.value[0] - other[0], self.value[1] - other[1], self.value[2] - other[2]]
+        if sub_values[2] < 0:
+            sub_values[1] -= 1
+            sub_values[2] += 75
+        if sub_values[1] < 0:
+            sub_values[0] -= 1
+            sub_values[1] += 60
+        return Index(sub_values)
 
     def __add__(self, other):
-        sub_value = self.value
-        for i in range(3)[1:]:
-            if i == 2: 
-                test_amount = 75
-            else: 
-                test_amount = 60
-            if (sub_value[i] + other[i]) > test_amount:
-                sub_value[i] -= test_amount
-                sub_value[i-1] += 1
-        return self([sub_value[0] + other[0], sub_value[1] + other[1], sub_value[2] + other[2]])
+        added_values = [self.value[0] + other[0], self.value[1] + other[1], self.value[2] + other[2]]
+        if added_values[2] >= 75:
+            added_values[1] += 1
+            added_values[2] -= 75
+        if added_values[1] >= 60:
+            added_values[0] += 1
+            added_values[1] -= 60
+        return Index(added_values)
+
+    def __lt__(self, other):
+        if (Index(self.value) - other).to_seconds("float") < 0:
+            return True
+        else:
+            return False
+
+    def __gt__(self, other):
+        if (Index(self.value) - other).to_seconds("float") > 0:
+            return True
+        else:
+            return False
+
+    def __eq__(self, other):
+        if (Index(self.value) - other).to_seconds("float") == 0:
+            return True
+        else:
+            return False
 
     def __getitem__(self, index):
         return self.value[index]
@@ -119,14 +131,17 @@ class Index(object):
         if not self.value:
             return "00:00:00" 
         else:
-            return "%s:%s:%s" % (self.value[0], self.add_zeroes(self.value[1]), self.add_zeroes(self.value[2]))
+            return "%s:%s" % (self.value[0], self.add_zeroes(self.value[1]))
 
-    def to_seconds(self):
+    def to_seconds(self, type="int"):
         """Assumes a list or tuple as input of 3 ints. Returns the sum of all three in seconds."""
         minutes = self.value[0] * 60
         seconds = self.value[1]
-        miliseconds = math.ceil(self.value[2] / 100.0)
-        return int(minutes + seconds + miliseconds)
+        frames = self.value[2] / 75.0
+        if type == "int":
+            return int(minutes + seconds + frames)
+        if type == "float":
+            return minutes + seconds + frames
 
     def add_zeroes(self, in_seconds):
         """Take a second integer and add the zeroes to make it look normal."""
