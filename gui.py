@@ -22,3 +22,8 @@ class ProgressBar(object):
         self.window.box()
         self.draw()
         self.window.refresh()
+
+    def destroy(self):
+        self.window.erase()
+        self.window.refresh()
+        self.window = False

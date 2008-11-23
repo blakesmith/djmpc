@@ -324,11 +324,14 @@ class CursesControl(object):
         signal.signal(signal.SIGWINCH, signal_handler)
         self.info_win = curses.newwin(8, 200, 0, 0)
         self.progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=1, y=7, x=0)
-        self.cue_progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=3, y=10, x=0)
         self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
-        self.cue_progress_bar.update(0)
+        self.cue_progress_bar = False
         self.body_win = curses.newwin(self.window_length+1, self.window_width, 13, 0)
         self.body_win.box()
+        if cue_control.cue_parsed:
+            self.cue_progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=3, y=10, x=0)
+            self.cue_progress_bar.update(0)
+
 
     def status_check(self):
         """Things that need to be checked or updated each iteration of the GUI loop."""
@@ -341,6 +344,12 @@ class CursesControl(object):
         control.status_update()
         cue_control.cue_parsed = False #unload current cuesheet
         cue_control.cue_init() #Recheck for a new cuesheet
+        if cue_control.cue_parsed:
+            self.cue_progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=3, y=10, x=0)
+        else:
+            if self.cue_progress_bar:
+                self.cue_progress_bar.destroy()
+                self.cue_progress_bar = False
         control.track_total_time = cuesheet.Index(control.current_song['time'])
 
     def window_draw(self):
@@ -353,8 +362,9 @@ class CursesControl(object):
         self.draw_cue_list()
         self.info_win.refresh()
         self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
-        self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
         self.body_win.refresh()
+        if cue_control.cue_parsed:
+            self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
 
     def user_input(self, char):
         """Handles all user input, and it's associated action. Returns the associated action for the input."""
