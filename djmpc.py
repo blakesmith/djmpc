@@ -324,7 +324,9 @@ class CursesControl(object):
         self.info_win = curses.newwin(8, 200, 0, 0)
         self.progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=1, y=7, x=0)
         self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
-        self.body_win = curses.newwin(curses.LINES - 12, self.window_width, 12, 0)
+        self.cue_progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=1, y=10, x=0)
+        self.cue_progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+        self.body_win = curses.newwin(self.window_length+1, self.window_width, 13, 0)
         self.body_win.box()
 
     def status_check(self):
@@ -350,6 +352,7 @@ class CursesControl(object):
         self.draw_cue_list()
         self.info_win.refresh()
         self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+        self.cue_progress_bar.update(control.track_current_time.percentage(control.track_total_time))
         self.body_win.refresh()
 
     def user_input(self, char):
@@ -365,7 +368,7 @@ class CursesControl(object):
             start_position = 1
             while song_info.cue_information[0] > start_position*self.window_length:
                 start_position += 1
-            for track, i in zip(cue_control.cue_parsed[(start_position-1)*self.window_length:start_position*self.window_length], range(self.window_length)):
+            for track, i in zip(cue_control.cue_parsed[(start_position-1)*self.window_length:start_position*self.window_length], range(self.window_length-1)):
                 cue_string = "[%s] %s - %s" % (track['length'], track['performer'], track['title'])
                 if track['track'] == song_info.cue_information[0]:
                     self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2], curses.color_pair(2))
