@@ -379,6 +379,8 @@ class CursesControl(object):
                     self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2], curses.color_pair(2))
                 else:
                     self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2])
+        else:
+            self.body_win.addstr(self.window_length / 2, 1, "No cuesheet for the current track.")
 
 def signal_handler(n, frame):
     curses_control = CursesControl()
