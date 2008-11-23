@@ -322,7 +322,7 @@ class CursesControl(object):
         curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
         signal.signal(signal.SIGWINCH, signal_handler)
         self.info_win = curses.newwin(8, 200, 0, 0)
-        self.progress_bar = gui.ProgressBar(curses, song_info, self.window_width, color_pair=1, y=7, x=0)
+        self.progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=1, y=7, x=0)
         self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
         self.body_win = curses.newwin(curses.LINES - 12, self.window_width, 12, 0)
         self.body_win.box()

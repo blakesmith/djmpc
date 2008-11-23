@@ -1,8 +1,7 @@
 class ProgressBar(object):
 
-    def __init__(self, curses, song_info, width, color_pair, y, x):
+    def __init__(self, curses, width, color_pair, y, x):
         self.curses = curses
-        self.song_info = song_info
         self.drawn = False
         self.window_width = width
         self.window_length = 3
