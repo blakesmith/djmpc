@@ -149,3 +149,9 @@ class Index(object):
             return "0%i" % in_seconds
         else:
             return str(in_seconds)
+
+    def percentage(self, other):
+        first_upper = Index(self.value).to_seconds('float')
+        second_upper = other.to_seconds('float')
+        return (first_upper / second_upper) * 100
+
