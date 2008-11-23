@@ -2,6 +2,7 @@
 
 import mpd
 import cuesheet
+import gui
 import sys
 import os
 import math
@@ -321,8 +322,8 @@ class CursesControl(object):
         curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
         signal.signal(signal.SIGWINCH, signal_handler)
         self.info_win = curses.newwin(8, 200, 0, 0)
-        self.progress_bar = curses.newwin(3, self.window_width, 9, 5)
-        self.progress_bar.box()
+        self.progress_bar = gui.ProgressBar(curses, song_info, self.window_width, 9, 5)
+        self.progress_bar.update()
         self.body_win = curses.newwin(curses.LINES - 12, self.window_width, 12, 5)
         self.body_win.box()
 
@@ -344,14 +345,11 @@ class CursesControl(object):
         self.info_win.erase()
         for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
             self.info_win.addstr(i+1, 5, j)
-        self.progress_bar.erase()
-        self.progress_bar.box()
-        self.draw_progress_bar()
         self.body_win.erase()
         self.body_win.box()
         self.draw_cue_list()
         self.info_win.refresh()
-        self.progress_bar.refresh()
+        self.progress_bar.update()
         self.body_win.refresh()
 
     def user_input(self, char):
@@ -361,12 +359,6 @@ class CursesControl(object):
         if char == ord('t'):
             control.toggle()     
             return "update"
-
-    def draw_progress_bar(self):
-        bar_length = self.window_width - 1
-        bar_fill_percentage = (song_info.song_percentage() / 100.0) * bar_length   
-        for i in range(int(bar_fill_percentage)):
-            self.progress_bar.addstr(1, i+1, " ", curses.color_pair(1))
 
     def draw_cue_list(self):
         if cue_control.cue_parsed:
@@ -399,8 +391,8 @@ def display_help():
 
 def curses_gui(stdscr):
     """Master function for all curses control."""
-    curses_control = CursesControl()
     control.client_init()
+    curses_control = CursesControl()
     while True:
         stdscr.refresh()
         curses_control.status_check()
