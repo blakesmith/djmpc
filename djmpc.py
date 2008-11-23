@@ -327,7 +327,7 @@ class CursesControl(object):
         self.cue_progress_bar = False
         self.body_win = curses.newwin(self.window_length+1, self.window_width, 13, 0)
         self.body_win.box()
-        self.draw_progress_bars()
+        self.activate_gui_objects()
 
     def status_check(self):
         """Things that need to be checked or updated each iteration of the GUI loop."""
@@ -335,7 +335,8 @@ class CursesControl(object):
             self.track_check()
         control.status_update()
 
-    def draw_progress_bars(self):
+    def activate_gui_objects(self):
+        objects = []
         if not cue_control.cue_parsed and self.cue_progress_bar:
             self.cue_progress_bar.destroy()
             self.cue_progress_bar = False
@@ -347,16 +348,29 @@ class CursesControl(object):
             self.cue_progress_bar.update(0)
             self.progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=3, y=7, x=0)
             self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
-        else:
+            objects.append(self.progress_bar), objects.append(self.cue_progress_bar)
+        elif not cue_control.cue_parsed and not control.server_is_stopped():
             self.progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=3, y=5, x=0)
             self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+            objects.append(self.progress_bar)
+        self.active_gui_objects = objects
+        return objects
+
+    def update_gui_objects(self):
+        for i in self.active_gui_objects:
+            if i == self.progress_bar:
+                self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+            elif i == self.cue_progress_bar:
+                self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
+            else:
+                i.update()
 
     def track_check(self):
         """Things that need to be checked or updated if the track is switched."""
         control.status_update()
         cue_control.cue_parsed = False #unload current cuesheet
         cue_control.cue_init() #Recheck for a new cuesheet
-        self.draw_progress_bars()
+        self.activate_gui_objects()
         control.track_total_time = cuesheet.Index(control.current_song['time'])
 
     def window_draw(self):
@@ -368,10 +382,8 @@ class CursesControl(object):
         self.body_win.box()
         self.draw_cue_list()
         self.info_win.refresh()
-        self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
         self.body_win.refresh()
-        if cue_control.cue_parsed:
-            self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
+        self.update_gui_objects()
 
     def user_input(self, char):
         """Handles all user input, and it's associated action. Returns the associated action for the input."""
