@@ -13,11 +13,12 @@ class ProgressBar(object):
         self.window = curses.newwin(self.window_length, self.window_width, self.y, self.x)
 
     def draw(self):
-        bar_fill_percentage = (self.song_info.song_percentage() / 100.0) * self.bar_length   
+        bar_fill_percentage = (self.percentage / 100.0) * self.bar_length   
         for i in range(int(bar_fill_percentage)):
             self.window.addstr(1, i+1, " ", self.curses.color_pair(self.color_pair))
 
-    def update(self):
+    def update(self, percentage=0):
+        self.percentage = percentage
         self.window.erase()
         self.window.box()
         self.draw()
