@@ -314,7 +314,7 @@ class CueControl(object):
 class CursesControl(object):
 
     def __init__(self):
-        self.window_width = curses.COLS - 10
+        self.window_width = curses.COLS
         self.window_length = curses.LINES - 14
         curses.curs_set(0)
         curses.halfdelay(MAIN_LOOP_CYCLE_TIME)
@@ -322,9 +322,9 @@ class CursesControl(object):
         curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
         signal.signal(signal.SIGWINCH, signal_handler)
         self.info_win = curses.newwin(8, 200, 0, 0)
-        self.progress_bar = gui.ProgressBar(curses, song_info, self.window_width, 9, 5)
+        self.progress_bar = gui.ProgressBar(curses, song_info, self.window_width, 7, 0)
         self.progress_bar.update()
-        self.body_win = curses.newwin(curses.LINES - 12, self.window_width, 12, 5)
+        self.body_win = curses.newwin(curses.LINES - 12, self.window_width, 12, 0)
         self.body_win.box()
 
     def status_check(self):
@@ -344,7 +344,7 @@ class CursesControl(object):
         """Handles all drawing of the actual GUI."""
         self.info_win.erase()
         for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
-            self.info_win.addstr(i+1, 5, j)
+            self.info_win.addstr(i, 0, j)
         self.body_win.erase()
         self.body_win.box()
         self.draw_cue_list()
