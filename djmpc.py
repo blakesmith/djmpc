@@ -320,12 +320,13 @@ class CursesControl(object):
         curses.halfdelay(MAIN_LOOP_CYCLE_TIME)
         curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLUE)
         curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
+        curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_WHITE)
         signal.signal(signal.SIGWINCH, signal_handler)
         self.info_win = curses.newwin(8, 200, 0, 0)
         self.progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=1, y=7, x=0)
+        self.cue_progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=3, y=10, x=0)
         self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
-        self.cue_progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=1, y=10, x=0)
-        self.cue_progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+        self.cue_progress_bar.update(0)
         self.body_win = curses.newwin(self.window_length+1, self.window_width, 13, 0)
         self.body_win.box()
 
@@ -352,7 +353,7 @@ class CursesControl(object):
         self.draw_cue_list()
         self.info_win.refresh()
         self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
-        self.cue_progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+        self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
         self.body_win.refresh()
 
     def user_input(self, char):
