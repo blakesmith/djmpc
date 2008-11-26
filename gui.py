@@ -1,4 +1,5 @@
 class GuiObject(object):
+    """Abstract GUI object class that all other GUI objects should inherit from."""
 
     def __init__(self, curses, length, width, color_pair, y, x):
         self.curses = curses
@@ -22,6 +23,7 @@ class GuiObject(object):
         self.window = False
 
 class InfoWin(GuiObject):
+    """Top information window that displays all current server status and track information."""
 
     def draw(self):
         for i, j in zip(range(len(self.song_info)), self.song_info):
@@ -34,6 +36,7 @@ class InfoWin(GuiObject):
         self.window.refresh()
 
 class ProgressBar(GuiObject):
+    """A percentage progress bar, used to denote song position."""
 
     def draw(self):
         self.bar_length = self.window_width - 1
@@ -49,6 +52,7 @@ class ProgressBar(GuiObject):
         self.window.refresh()
 
 class BodyWin(GuiObject):
+    """General body window that can be used to display any sort extra relevant text. Used to display current cuesheet position."""
 
     def draw(self):
         start_position = 1

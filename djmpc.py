@@ -323,6 +323,7 @@ class CursesControl(object):
         control.status_update()
 
     def activate_gui_objects(self):
+        """Initializes all relevant GUI objects"""
         objects = []
         song_info.gather_song_info()
         self.info_win = gui.InfoWin(curses, length=7, width=self.window_width, color_pair=1, y=0, x=0)  
@@ -343,11 +344,13 @@ class CursesControl(object):
         return objects
 
     def destroy_gui_objects(self):
+        """Destroys all relevant GUI objects."""
         for i in self.active_gui_objects:
             i.destroy()
             i = False
 
     def update_gui_objects(self):
+        """Updates all active GUI objects."""
         for i in self.active_gui_objects:
             if i == self.info_win:
                 self.info_win.update(song_info.gather_song_info())
