@@ -195,14 +195,14 @@ class SongInfo(object):
         if cue_control.cue_parsed:
             self.cue_information = cue_control.cue_update()
             gathered_song_info.append("[CUE Track %s.] %s - %s" % (self.cue_information[0], self.cue_information[1], self.cue_information[2]))
-            gathered_song_info.append("%s / %s" % (self.cue_information[4], self.cue_information[3]))
+            gathered_song_info.append("%s / %s [%s%%]" % (self.cue_information[4], self.cue_information[3], int(self.cue_information[4].percentage(self.cue_information[3]))))
         gathered_song_info.append(song_info.title_values())
         gathered_song_info.append("random: %s repeat: %s" % (song_info.random_status(), song_info.repeat_status()))
         gathered_song_info.append("state: %s volume: %s" % (control.current_status['state'], control.current_status['volume']))
         if not control.server_is_stopped():
             gathered_song_info.append("bitrate: %s" % song_info.bitrate_status())
             if control.track_total_time:
-                gathered_song_info.append("%s / %s [%s%%]" % (control.track_current_time, control.track_total_time, str(song_info.song_percentage())))
+                gathered_song_info.append("%s / %s [%s%%]" % (control.track_current_time, control.track_total_time, int(control.track_current_time.percentage(control.track_total_time))))
         return gathered_song_info
 
     def repeat_status(self):
@@ -236,19 +236,6 @@ class SongInfo(object):
             return "%s - %s" % (control.current_song['name'], control.current_song['title'])
         elif control.current_song.has_key("file"):
             return "%s" % (control.current_song['file'])
-
-    def song_percentage(self):
-        """Calculate and return the percentage of current track."""
-        if not control.server_is_stopped():
-            time_status = control.current_status['time']
-            current_time = float(time_status.rsplit(":")[0])
-            total_time = float(time_status.rsplit(":")[1])
-            if total_time > 0:
-                return int((current_time / total_time) * 100)
-            else:
-                return 0
-        else:
-            return 0
 
 class CueControl(object):
     """Object to control the functions associated with cuesheet reading."""
