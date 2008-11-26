@@ -26,8 +26,11 @@ class InfoWin(GuiObject):
     """Top information window that displays all current server status and track information."""
 
     def draw(self):
-        for i, j in zip(range(len(self.song_info)), self.song_info):
-            self.window.addstr(i, 0, j)
+        try:
+            for i, j in zip(range(len(self.song_info)), self.song_info):
+                self.window.addstr(i, 0, j)
+        except:
+            pass
 
     def update(self, song_info):
         self.song_info = song_info
@@ -39,10 +42,13 @@ class ProgressBar(GuiObject):
     """A percentage progress bar, used to denote song position."""
 
     def draw(self):
-        self.bar_length = self.window_width - 1
-        bar_fill_percentage = (self.percentage / 100.0) * self.bar_length   
-        for i in range(int(bar_fill_percentage)):
-            self.window.addstr(1, i+1, " ", self.curses.color_pair(self.color_pair))
+        try:
+            self.bar_length = self.window_width - 1
+            bar_fill_percentage = (self.percentage / 100.0) * self.bar_length   
+            for i in range(int(bar_fill_percentage)):
+                self.window.addstr(1, i+1, " ", self.curses.color_pair(self.color_pair))
+        except:
+            pass
 
     def update(self, percentage=0):
         self.percentage = percentage
