@@ -404,8 +404,8 @@ def curses_gui(stdscr):
             break
         elif user_input == "resize":
             curses.resize_term(*stdscr.getmaxyx())
-            curses_control = CursesControl()
             curses_control.destroy_gui_objects()
+            curses_control = CursesControl()
             curses_control.activate_gui_objects()
             curses_control.update_gui_objects()
 
