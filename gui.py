@@ -21,7 +21,6 @@ class GuiObject(object):
         self.window.refresh()
         self.window = False
 
-
 class ProgressBar(GuiObject):
 
     def draw(self):

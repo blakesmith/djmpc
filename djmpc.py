@@ -380,22 +380,6 @@ class CursesControl(object):
             control.toggle()     
             return "update"
 
-    def draw_cue_list(self):
-        if cue_control.cue_parsed:
-            start_position = 1
-            while song_info.cue_information[0] > start_position*self.window_length:
-                start_position += 1
-            for track, i in zip(cue_control.cue_parsed[(start_position-1)*self.window_length:start_position*self.window_length], range(self.window_length-1)):
-                cue_string = "[%s] %s - %s" % (track['length'], track['performer'], track['title'])
-                if track['track'] == song_info.cue_information[0]:
-                    self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2], curses.color_pair(2))
-                else:
-                    self.body_win.addstr(i+1, 1, cue_string[:self.window_width-2])
-        elif control.server_is_stopped():
-            self.body_win.addstr(self.window_length / 2, 1, "Nothing is playing.")
-        else:
-            self.body_win.addstr(self.window_length / 2, 1, "No cuesheet for the current track.")
-
 def signal_handler(n, frame):
     curses_control = CursesControl()
 
