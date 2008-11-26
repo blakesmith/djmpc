@@ -172,6 +172,8 @@ class MpdControl(object):
     def track_has_started_or_stopped(self):
         """See if the user goes from the 'stop' state to the 'play' state, or visa-versa."""
         try:
+            if control.current_status['state'] == 'play' or control.current_status['state'] == 'pause':
+                return False
             if control.current_status['state'] == control.client.status()['state']:
                 return False
             else:
@@ -374,7 +376,7 @@ class CursesControl(object):
     def user_input(self, char):
         """Handles all user input, and it's associated action. Returns the associated action for the input."""
         if char == ord('q'):
-            return "quit"
+            return "quit"	
         if char == ord('t'):
             control.toggle()     
             return "update"
