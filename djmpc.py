@@ -308,7 +308,6 @@ class CursesControl(object):
         curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLUE)
         curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_WHITE)
-        signal.signal(signal.SIGWINCH, signal_handler)
         self.active_gui_objects = []
         self.progress_bar = False
         self.cue_progress_bar = False
@@ -379,9 +378,8 @@ class CursesControl(object):
         if char == ord('t'):
             control.toggle()     
             return "update"
-
-def signal_handler(n, frame):
-    curses_control = CursesControl()
+        if char == curses.KEY_RESIZE:
+            return "resize"
 
 def display_song_info():
     """Pretty output of gather_song_info()."""
@@ -400,12 +398,16 @@ def curses_gui(stdscr):
     while True:
         stdscr.refresh()
         curses_control.status_check()
-        curses_control.update_gui_objects()
         user_input = curses_control.user_input(stdscr.getch())
+        curses_control.update_gui_objects()
         if user_input == "quit":
             break
-        elif user_input == "update":
-            curses_control.window_draw()
+        elif user_input == "resize":
+            curses.resize_term(*stdscr.getmaxyx())
+            curses_control = CursesControl()
+            curses_control.destroy_gui_objects()
+            curses_control.activate_gui_objects()
+            curses_control.update_gui_objects()
 
 if __name__ == "__main__":
     try:
