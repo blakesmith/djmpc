@@ -21,6 +21,18 @@ class GuiObject(object):
         self.window.refresh()
         self.window = False
 
+class InfoWin(GuiObject):
+
+    def draw(self):
+        for i, j in zip(range(len(self.song_info)), self.song_info):
+            self.window.addstr(i, 0, j)
+
+    def update(self, song_info):
+        self.song_info = song_info
+        self.window.erase()
+        self.draw()
+        self.window.refresh()
+
 class ProgressBar(GuiObject):
 
     def draw(self):

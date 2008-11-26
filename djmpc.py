@@ -310,10 +310,10 @@ class CursesControl(object):
         curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_WHITE)
         signal.signal(signal.SIGWINCH, signal_handler)
         self.active_gui_objects = []
-        self.info_win = curses.newwin(8, 200, 0, 0)
         self.progress_bar = False
         self.cue_progress_bar = False
-        song_info.gather_song_info()
+        self.body_win = False
+        self.info_win = False
         self.activate_gui_objects()
 
     def status_check(self):
@@ -324,6 +324,9 @@ class CursesControl(object):
 
     def activate_gui_objects(self):
         objects = []
+        song_info.gather_song_info()
+        self.info_win = gui.InfoWin(curses, length=7, width=self.window_width, color_pair=1, y=0, x=0)  
+        objects.append(self.info_win)
         if cue_control.cue_parsed:
             self.cue_progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=1, y=10, x=0)
             self.cue_progress_bar.update(0)
@@ -333,7 +336,7 @@ class CursesControl(object):
             self.body_win.update(song_info.cue_information[0], cue_control.cue_parsed)
             objects.append(self.progress_bar), objects.append(self.cue_progress_bar), objects.append(self.body_win)
         elif not cue_control.cue_parsed and not control.server_is_stopped():
-            self.progress_bar = gui.ProgressBar(curses, 3, self.window_width, color_pair=3, y=5, x=0)
+            self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=5, x=0)
             self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
             objects.append(self.progress_bar)
         self.active_gui_objects = objects
@@ -346,7 +349,9 @@ class CursesControl(object):
 
     def update_gui_objects(self):
         for i in self.active_gui_objects:
-            if i == self.progress_bar:
+            if i == self.info_win:
+                self.info_win.update(song_info.gather_song_info())
+            elif i == self.progress_bar:
                 self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
             elif i == self.cue_progress_bar:
                 self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
@@ -366,10 +371,6 @@ class CursesControl(object):
 
     def window_draw(self):
         """Handles all drawing of the actual GUI."""
-        self.info_win.erase()
-        for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
-            self.info_win.addstr(i, 0, j)
-        self.info_win.refresh()
         self.update_gui_objects()
 
     def user_input(self, char):
