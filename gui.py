@@ -56,9 +56,10 @@ class BodyWin(GuiObject):
 
     def draw(self):
         start_position = 1
-        while self.current_track > start_position*self.window_length:
+        visible_window = self.window_length-2
+        while self.current_track > start_position*visible_window:
             start_position += 1
-        for track, i in zip(self.cue_parsed[(start_position-1)*self.window_length:start_position*self.window_length], range(self.window_length-2)):
+        for track, i in zip(self.cue_parsed[(start_position-1)*visible_window:start_position*visible_window], range(visible_window)):
             cue_string = "[%s] %s - %s" % (track['length'], track['performer'], track['title'])
             if track['track'] == self.current_track:
                 self.window.addstr(i+1, 1, cue_string[:self.window_width-2], self.curses.color_pair(2))
