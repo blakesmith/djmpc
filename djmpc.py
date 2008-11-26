@@ -309,11 +309,11 @@ class CursesControl(object):
         curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_WHITE)
         signal.signal(signal.SIGWINCH, signal_handler)
+        self.active_gui_objects = []
         self.info_win = curses.newwin(8, 200, 0, 0)
         self.progress_bar = False
         self.cue_progress_bar = False
-        self.body_win = curses.newwin(self.window_length+1, self.window_width, 13, 0)
-        self.body_win.box()
+        song_info.gather_song_info()
         self.activate_gui_objects()
 
     def status_check(self):
@@ -324,24 +324,25 @@ class CursesControl(object):
 
     def activate_gui_objects(self):
         objects = []
-        if not cue_control.cue_parsed and self.cue_progress_bar:
-            self.cue_progress_bar.destroy()
-            self.cue_progress_bar = False
-        if self.progress_bar:
-            self.progress_bar.destroy()
-            self.progress_bar = False
         if cue_control.cue_parsed:
-            self.cue_progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=1, y=10, x=0)
+            self.cue_progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=1, y=10, x=0)
             self.cue_progress_bar.update(0)
-            self.progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=3, y=7, x=0)
+            self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=7, x=0)
             self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
-            objects.append(self.progress_bar), objects.append(self.cue_progress_bar)
+            self.body_win = gui.BodyWin(curses, length=self.window_length+1, width=self.window_width, color_pair=1, y=13, x=0)
+            self.body_win.update(song_info.cue_information[0], cue_control.cue_parsed)
+            objects.append(self.progress_bar), objects.append(self.cue_progress_bar), objects.append(self.body_win)
         elif not cue_control.cue_parsed and not control.server_is_stopped():
-            self.progress_bar = gui.ProgressBar(curses, self.window_width, color_pair=3, y=5, x=0)
+            self.progress_bar = gui.ProgressBar(curses, 3, self.window_width, color_pair=3, y=5, x=0)
             self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
             objects.append(self.progress_bar)
         self.active_gui_objects = objects
         return objects
+
+    def destroy_gui_objects(self):
+        for i in self.active_gui_objects:
+            i.destroy()
+            i = False
 
     def update_gui_objects(self):
         for i in self.active_gui_objects:
@@ -349,6 +350,8 @@ class CursesControl(object):
                 self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
             elif i == self.cue_progress_bar:
                 self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
+            elif i == self.body_win:
+                self.body_win.update(song_info.cue_information[0], cue_control.cue_parsed)
             else:
                 i.update()
 
@@ -357,7 +360,8 @@ class CursesControl(object):
         control.status_update()
         cue_control.cue_parsed = False #unload current cuesheet
         cue_control.cue_init() #Recheck for a new cuesheet
-        self.activate_gui_objects()
+        self.destroy_gui_objects()
+        self.active_objects = self.activate_gui_objects()
         control.track_total_time = cuesheet.Index(control.current_song['time'])
 
     def window_draw(self):
@@ -365,11 +369,7 @@ class CursesControl(object):
         self.info_win.erase()
         for i, j in zip(range(len(song_info.gather_song_info())), song_info.gather_song_info()):
             self.info_win.addstr(i, 0, j)
-        self.body_win.erase()
-        self.body_win.box()
-        self.draw_cue_list()
         self.info_win.refresh()
-        self.body_win.refresh()
         self.update_gui_objects()
 
     def user_input(self, char):
