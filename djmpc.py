@@ -367,9 +367,9 @@ class CursesControl(object):
         control.status_update()
         cue_control.cue_parsed = False #unload current cuesheet
         cue_control.cue_init() #Recheck for a new cuesheet
-        self.destroy_gui_objects()
-        self.active_objects = self.activate_gui_objects()
         control.track_total_time = cuesheet.Index(control.current_song['time'])
+        self.destroy_gui_objects()
+        self.active_gui_objects = self.activate_gui_objects()
 
     def user_input(self, char):
         """Handles all user input, and it's associated action. Returns the associated action for the input."""
