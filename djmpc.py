@@ -369,10 +369,6 @@ class CursesControl(object):
         self.active_objects = self.activate_gui_objects()
         control.track_total_time = cuesheet.Index(control.current_song['time'])
 
-    def window_draw(self):
-        """Handles all drawing of the actual GUI."""
-        self.update_gui_objects()
-
     def user_input(self, char):
         """Handles all user input, and it's associated action. Returns the associated action for the input."""
         if char == ord('q'):
@@ -401,7 +397,7 @@ def curses_gui(stdscr):
     while True:
         stdscr.refresh()
         curses_control.status_check()
-        curses_control.window_draw()
+        curses_control.update_gui_objects()
         user_input = curses_control.user_input(stdscr.getch())
         if user_input == "quit":
             break
