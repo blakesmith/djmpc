@@ -391,7 +391,19 @@ def display_song_info():
 
 def display_help():
     """Invoked when user has malformed input or sends '--help'."""
-    print "This is the standard help output that gets piped to stdout"
+    print """Usage: djmpc <command> [command args]...
+    
+    djmpc nc                    Runs djmpc in ncurses mode
+    djmpc cuelist               List all tracks within current cuesheet
+    djmpc cueseek <track>       Seek to track within current cuesheet
+    djmpc seek MM:SS            Seek to time within track
+    djmpc play                  Play if paused
+    djmpc pause                 Pause if playing 
+    djmpc toggle                Play or Pause current track
+    djmpc repeat                Turn repeat on or off
+    djmpc random                Turn random on or off
+    djmpc volume <num>          Set volume to <num>
+    """
 
 def curses_gui(stdscr):
     """Master function for all curses control."""
