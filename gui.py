@@ -28,7 +28,7 @@ class InfoWin(GuiObject):
     def draw(self):
         try:
             for i, j in zip(range(len(self.song_info)), self.song_info):
-                self.window.addstr(i, 0, j)
+                self.window.addstr(i, 0, j[:self.window_width])
         except:
             pass
 
