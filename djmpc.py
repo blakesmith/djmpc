@@ -106,7 +106,8 @@ class MpdControl(object):
     def cue_seek(self, track_string):
         """Seeks to a track number within a cue."""
         self.client_init()
-        current_id = self.current_song['id']
+        if not self.server_is_stopped():
+            current_id = self.current_song['id']
         if cue_control.cue_init():
             try:
                 track_int = int(track_string)
@@ -117,6 +118,8 @@ class MpdControl(object):
                     self.client.seek(current_id, i['index'].to_seconds()) 
                     display_song_info()
                     break
+        else:
+            print "No cuesheet found for the current song"
 
     def time_split(self, in_time):
         """Takes a string input in the form "34:123", outputs the first number as an integer"""
@@ -257,6 +260,8 @@ class CueControl(object):
                 return True
             else:
                 return False
+        else:
+            return False
 
     def cue_load(self, path):
         """Handles the actual file handling of opening and storing the contents of the cuesheet in memory."""
