@@ -175,8 +175,10 @@ class MpdControl(object):
     def track_has_started_or_stopped(self):
         """See if the user goes from the 'stop' state to the 'play' state, or visa-versa."""
         try:
-            if control.current_status['state'] == 'play' or control.current_status['state'] == 'pause':
-                return False
+            if control.current_status['state'] == 'play' and control.client.status()['state'] == 'pause':
+                return False # Go from play to pause
+            if control.current_status['state'] == 'pause' and control.client.status()['state'] == 'play':
+                return False # Go from pause to play
             if control.current_status['state'] == control.client.status()['state']:
                 return False
             else:
