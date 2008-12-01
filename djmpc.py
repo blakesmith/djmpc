@@ -3,6 +3,7 @@
 import mpd
 import cuesheet
 import gui
+import objects
 import sys
 import os
 import math
@@ -21,19 +22,19 @@ class MpdControl(object):
 
     def client_init(self):
         """Things that should be loaded, started or run when the client first starts."""
-        self.track_total_time = 0
+        self.current_track = False
         self.status_update()
+        self.current_track = objects.Track(self.current_song)
         if not self.server_is_stopped():
             cue_control.cue_init()
-            self.track_total_time = cuesheet.Index(self.current_song['time'])
 
     def status_update(self):
         """Current statuses that are updated each iteration of the main loop."""
         try:
-            control.current_status = control.client.status()
-            if not self.server_is_stopped():
-                self.current_song = self.client.currentsong()
-                self.track_current_time = cuesheet.Index(self.time_split(self.current_status['time']))
+            self.current_status = control.client.status()
+            self.current_song = self.client.currentsong()
+            if self.current_track:
+                self.current_track.update_current_time(self.current_status['time'])
             return True
         except:
             return False
@@ -208,8 +209,8 @@ class SongInfo(object):
         gathered_song_info.append("state: %s volume: %s" % (control.current_status['state'], control.current_status['volume']))
         if not control.server_is_stopped():
             gathered_song_info.append("bitrate: %s" % song_info.bitrate_status())
-            if control.track_total_time:
-                gathered_song_info.append("%s / %s [%s%%]" % (control.track_current_time, control.track_total_time, int(control.track_current_time.percentage(control.track_total_time))))
+            if control.current_track.current_time:
+                gathered_song_info.append("%s / %s [%s%%]" % (control.current_track.current_time, control.current_track.total_time, int(control.current_track.current_time.percentage(control.current_track.total_time))))
         return gathered_song_info
 
     def repeat_status(self):
@@ -292,9 +293,9 @@ class CueControl(object):
             if self.cue_parsed:
                 for i in cue_control.cue_parsed:
                     current_index = i['index']
-                    if control.track_current_time < current_index:
+                    if control.current_track.current_time < current_index:
                         break
-                    self.current_track_time = control.track_current_time - current_index
+                    self.current_track_time = control.current_track.current_time - current_index
                     cue_info = (i['track'], i['performer'], i['title'], i['length'], self.current_track_time)
                 return cue_info
             else:
@@ -340,13 +341,13 @@ class CursesControl(object):
             self.cue_progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=1, y=10, x=0)
             self.cue_progress_bar.update(0)
             self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=7, x=0)
-            self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+            self.progress_bar.update(control.current_track.current_time.percentage(control.current_track.total_time))
             self.body_win = gui.BodyWin(curses, length=self.window_length+1, width=self.window_width, color_pair=1, y=13, x=0)
             self.body_win.update(song_info.cue_information[0], cue_control.cue_parsed)
             objects.append(self.progress_bar), objects.append(self.cue_progress_bar), objects.append(self.body_win)
         elif not cue_control.cue_parsed and not control.server_is_stopped():
             self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=5, x=0)
-            self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+            self.progress_bar.update(control.current_track.current_time.percentage(control.current_track.total_time))
             objects.append(self.progress_bar)
         self.active_gui_objects = objects
         return objects
@@ -363,7 +364,7 @@ class CursesControl(object):
             if i == self.info_win:
                 self.info_win.update(song_info.gather_song_info())
             elif i == self.progress_bar:
-                self.progress_bar.update(control.track_current_time.percentage(control.track_total_time))
+                self.progress_bar.update(control.current_track.current_time.percentage(control.current_track.total_time))
             elif i == self.cue_progress_bar:
                 self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
             elif i == self.body_win:
@@ -376,7 +377,7 @@ class CursesControl(object):
         control.status_update()
         cue_control.cue_parsed = False #unload current cuesheet
         cue_control.cue_init() #Recheck for a new cuesheet
-        control.track_total_time = cuesheet.Index(control.current_song['time'])
+        control.current_track = objects.Track(control.current_song)
         self.destroy_gui_objects()
         self.active_gui_objects = self.activate_gui_objects()
 

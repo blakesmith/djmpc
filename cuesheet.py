@@ -66,7 +66,7 @@ class Index(object):
 
     def __init__(self, value = None):
         self.value = value
-        if self.value:
+        if not self.value == None:
             if isinstance(self.value, str):
                 try:
                     self.value = int(self.value)
