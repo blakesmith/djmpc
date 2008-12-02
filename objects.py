@@ -8,6 +8,7 @@ class Track(object):
         self.artist = self._get_artist()
         self.total_time = self._get_total_time()
         self.update_current_time()
+        self.id = current_song['id']
         self.cue_parsed = False
 
     def _get_artist(self):
