@@ -9,7 +9,6 @@ import os
 import math
 import curses
 import time
-import signal
 from config import *
 
 MAIN_LOOP_CYCLE_TIME = 2
