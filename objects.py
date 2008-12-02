@@ -8,6 +8,7 @@ class Track(object):
         self.artist = self._get_artist()
         self.total_time = self._get_total_time()
         self.update_current_time()
+        self.cue_parsed = False
 
     def _get_artist(self):
         """Depending on what ID3 information is available, print the relevant artist name."""
