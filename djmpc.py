@@ -82,9 +82,7 @@ class MpdControl(object):
             print "No cuesheet found for the current song"
 
     def seek(self, seek_string):
-        """First tries to see if the input was able to be converted to an int. If that fails, try to seek using a time formated string
-        (eg. '23:34'). If that fails, see if the input from the command line is properly formed. If it was able to convert to an int, 
-        seek to that position."""
+        """Seeks within the current track, either by an integer, or by a properly formatted string. eg: '19:32'"""
         self.client_init()
         current_id = control.current_track.id
         try:
