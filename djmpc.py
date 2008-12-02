@@ -234,17 +234,6 @@ class SongInfo(object):
         else:
             return 0
 
-    def title_values(self):
-        """Depending on what ID3 information is available, print the relevant artist name and title."""
-        if control.server_is_stopped():
-            return "Nothing is playing."
-        if control.current_song.has_key("artist") and control.current_song.has_key("title"):
-            return "%s - %s" % (control.current_song['artist'], control.current_song['title'])
-        elif control.current_song.has_key("name") and control.current_song.has_key("title"):
-            return "%s - %s" % (control.current_song['name'], control.current_song['title'])
-        elif control.current_song.has_key("file"):
-            return "%s" % (control.current_song['file'])
-
 class CueControl(object):
     """Object to control the functions associated with cuesheet reading."""
 
