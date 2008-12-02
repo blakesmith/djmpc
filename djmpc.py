@@ -122,11 +122,6 @@ class MpdControl(object):
         else:
             print "No cuesheet found for the current song"
 
-    def time_split(self, in_time):
-        """Takes a string input in the form "34:123", outputs the first number as an integer"""
-        out_time = in_time.rsplit(":")[0]
-        return out_time
-
     def random(self):
         """Enable or disable random."""
         try:
