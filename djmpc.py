@@ -195,7 +195,7 @@ class SongInfo(object):
     def gather_song_info(self):
         """Gathers all the current song info to be displayed as a dictionary. If a cuesheet exists, add that as well."""
         gathered_song_info = []
-        if control.current_track.cue_parsed:
+        if control.current_track.has_cuesheet():
             self.cue_information = cue_control.cue_update()
             gathered_song_info.append("[CUE Track %s.] %s - %s" % (self.cue_information[0], self.cue_information[1], self.cue_information[2]))
             gathered_song_info.append("%s / %s [%s%%]" % (self.cue_information[4], self.cue_information[3], int(self.cue_information[4].percentage(self.cue_information[3]))))
@@ -240,7 +240,7 @@ class CueControl(object):
     def cue_init(self):
         """Checks to see if a cuesheet has been loaded into memory already. If no, checks to see if the current track has a cuesheet visible in the filesystem. If so returns True. Otherwise returns false."""
         if not control.server_is_stopped():
-            if control.current_track.cue_parsed: #Is something loaded into memory?
+            if control.current_track.has_cuesheet(): #Is something loaded into memory?
                 return True
             if self.cue_load(control.current_song['file']): #Does a cuesheet exist for the currently playing file, if so, is it loaded?
                 return True
@@ -251,7 +251,7 @@ class CueControl(object):
 
     def cue_load(self, path):
         """Handles the actual file handling of opening and storing the contents of the cuesheet in memory."""
-        if not control.current_track.cue_parsed: # Has a cuesheet been loaded into memory?
+        if not control.current_track.has_cuesheet(): # Has a cuesheet been loaded into memory?
             path = os.path.splitext(path)[0] + ".cue"
             local = os.path.join(self.music_directory, path)
             remote = os.path.join(self.cue_directory, path)
@@ -273,7 +273,7 @@ class CueControl(object):
     def cue_update(self):
         """Function to be run every loop to see where the song is in the current cuesheet. Return the relevant information about the current location."""
         if not control.server_is_stopped():
-            if control.current_track.cue_parsed:
+            if control.current_track.has_cuesheet():
                 for i in control.current_track.cue_parsed:
                     current_index = i['index']
                     if control.current_track.current_time < current_index:
@@ -320,7 +320,7 @@ class CursesControl(object):
         song_info.gather_song_info()
         self.info_win = gui.InfoWin(curses, length=7, width=self.window_width, color_pair=1, y=0, x=0)  
         objects.append(self.info_win)
-        if control.current_track.cue_parsed:
+        if control.current_track.has_cuesheet():
             self.cue_progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=1, y=10, x=0)
             self.cue_progress_bar.update(0)
             self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=7, x=0)
@@ -328,7 +328,7 @@ class CursesControl(object):
             self.body_win = gui.BodyWin(curses, length=self.window_length+1, width=self.window_width, color_pair=1, y=13, x=0)
             self.body_win.update(song_info.cue_information[0], control.current_track.cue_parsed)
             objects.append(self.progress_bar), objects.append(self.cue_progress_bar), objects.append(self.body_win)
-        elif not control.current_track.cue_parsed and not control.server_is_stopped():
+        elif not control.current_track.has_cuesheet() and not control.server_is_stopped():
             self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=5, x=0)
             self.progress_bar.update(control.current_track.current_time.percentage(control.current_track.total_time))
             objects.append(self.progress_bar)

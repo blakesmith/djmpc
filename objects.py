@@ -39,3 +39,9 @@ class Track(object):
             return "%s - %s" % (self.artist, self.title)
         else:
             return "%s" % self.artist
+
+    def has_cuesheet(self):
+        if self.cue_parsed:
+            return True
+        else:
+            return False
