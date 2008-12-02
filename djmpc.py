@@ -285,9 +285,8 @@ class CueControl(object):
     def append_last_length(self):
         """Since cuesheet.py can't provide the length of the last track, deduce it from the length of the song, and append it to the parsed cuesheet."""
         num_tracks = self.cue_lib.num_tracks()
-        track_time = int(control.current_song['time'])
-        last_index = control.current_track.cue_parsed[num_tracks - 1]['index'].to_seconds()
-        control.current_track.cue_parsed[num_tracks - 1]['length'] = cuesheet.Index(track_time - last_index)
+        last_index = control.current_track.cue_parsed[num_tracks - 1]['index']
+        control.current_track.cue_parsed[num_tracks - 1]['length'] = control.current_track.total_time - last_index
 
 class CursesControl(object):
 
