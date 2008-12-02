@@ -359,7 +359,6 @@ class CursesControl(object):
         """Things that need to be checked or updated if the track is switched."""
         control.status_update()
         control.current_track = objects.Track(control.current_song)
-        control.current_track.cue_parsed = False #unload current cuesheet
         cue_control.cue_init() #Recheck for a new cuesheet
         self.destroy_gui_objects()
         self.active_gui_objects = self.activate_gui_objects()
