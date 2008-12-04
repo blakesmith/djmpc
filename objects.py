@@ -8,7 +8,7 @@ class Track(object):
         self.artist = self._get_artist()
         self.total_time = self._get_total_time()
         self.update_current_time()
-        self.id = current_song['id']
+        if "id" in current_song: self.id = current_song['id']
         self.cue_parsed = False
 
     def _get_artist(self):
@@ -20,7 +20,7 @@ class Track(object):
         elif "file" in self.current_song:
             return self.current_song['file']
         else:
-            return ""
+            return "Nothing is playing."
 
     def _get_title(self):
         if "title" in self.current_song:
@@ -29,7 +29,10 @@ class Track(object):
             return ""
 
     def _get_total_time(self):
-        return Index(self.current_song['time'])
+        if "time" in self.current_song:
+            return Index(self.current_song['time'])
+        else:
+            return Index(0)
 
     def update_current_time(self, time_value="0:0"):
         """Takes a string input in the form "34:123", outputs the first number as an integer"""
