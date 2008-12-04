@@ -76,9 +76,9 @@ class MpdControl(object):
         self.client_init()
         if cue_control.cue_init():
             for i in control.current_track.cue_parsed:
-                print "[%s] %i: %s - %s at %s" % (i['length'], i['track'], i['performer'], i['title'], i['index'])
+                print("[%s] %i: %s - %s at %s" % (i['length'], i['track'], i['performer'], i['title'], i['index']))
         else:
-            print "No cuesheet found for the current song"
+            print("No cuesheet found for the current song")
 
     def seek(self, seek_string):
         """Seeks within the current track, either by an integer, or by a properly formatted string. eg: '19:32'"""
@@ -95,7 +95,7 @@ class MpdControl(object):
                     int_split.append(int(i))
                 int_split = cuesheet.Index(int_split)
             elif len(string_split) > 2:
-                print "Malformed seek time. Try 'minutes:seconds' or just 'seconds'"
+                print("Malformed seek time. Try 'minutes:seconds' or just 'seconds'")
         if isinstance(seek_string, int):
             self.client.seek(current_id, seek_string)
         else:
@@ -110,14 +110,14 @@ class MpdControl(object):
             try:
                 track_int = int(track_string)
             except:
-                print "Not a valid track number!"
+                print("Not a valid track number!")
             for i in control.current_track.cue_parsed:
                 if i['track'] == int(track_int):
                     self.client.seek(current_id, i['index'].to_seconds()) 
                     display_song_info()
                     break
         else:
-            print "No cuesheet found for the current song"
+            print("No cuesheet found for the current song")
 
     def random(self):
         """Enable or disable random."""
@@ -146,11 +146,11 @@ class MpdControl(object):
         try:
             vol = int(vol)
             if vol < 0 or vol > 100:
-                print "Outside a valid volume range!"
+                print("Outside a valid volume range!")
             else:
                 self.client.setvol(vol)
         except: 
-            print "Not a valid volume range!"
+            print("Not a valid volume range!")
 
     def track_has_changed(self):
         """See if the playing track has ended and another has begun."""
@@ -373,11 +373,11 @@ def display_song_info():
     """Pretty output of gather_song_info()."""
     control.client_init()
     for i in song_info.gather_song_info():
-        print i
+        print(i)
 
 def display_help():
     """Invoked when user has malformed input or sends '--help'."""
-    print """Usage: djmpc <command> [command args]...
+    print("""Usage: djmpc <command> [command args]...
     
     djmpc nc                    Runs djmpc in ncurses mode
     djmpc cuelist               List all tracks within current cuesheet
@@ -389,7 +389,7 @@ def display_help():
     djmpc repeat                Turn repeat on or off
     djmpc random                Turn random on or off
     djmpc volume <num>          Set volume to <num>
-    """
+    """)
 
 def curses_gui(stdscr):
     """Master function for all curses control."""
@@ -417,7 +417,7 @@ if __name__ == "__main__":
         while not control.client_connect():
             time.sleep(1)
     except:
-        print "Unable to connect to mpd server!"
+        print("Unable to connect to mpd server!")
     if (len(sys.argv) == 1):
         display_song_info()
     else:

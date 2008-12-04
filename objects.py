@@ -13,17 +13,17 @@ class Track(object):
 
     def _get_artist(self):
         """Depending on what ID3 information is available, print the relevant artist name."""
-        if self.current_song.has_key("artist"):
+        if "artist" in self.current_song:
             return self.current_song['artist']
-        elif self.current_song.has_key("name"):
+        elif "name" in self.current_song:
             return self.current_song['name']
-        elif self.current_song.has_key("file"):
+        elif "file" in self.current_song:
             return self.current_song['file']
         else:
             return ""
 
     def _get_title(self):
-        if self.current_song.has_key("title"):
+        if "title" in self.current_song:
             return self.current_song['title']
         else:
             return ""
