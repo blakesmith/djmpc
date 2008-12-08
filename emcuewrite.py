@@ -25,7 +25,7 @@ def do_parse(in_file, out_file):
         out_file.write('   PERFORMER "Essential Mix"\n') 
         out_file.write('   TITLE "Intro"\n') 
         out_file.write('   INDEX 01 00:00:00\n') 
-        for i, j in zip(track_file_split, range(len(track_file_split))):
+        for i, j in enumerate(track_file_split):
             j = j + 2
             if j < 10:
                 track_string = "0"+str(j)
