@@ -254,10 +254,14 @@ class CueControl(object):
             if os.path.exists(local):
                 control.current_track.cuesheet = cuesheet.Cuesheet()
                 control.current_track.cuesheet.open(local, control.current_track.total_time)
+                control.current_track.artist = control.current_track._get_artist()
+                control.current_track.title = control.current_track._get_title()
                 return True
             elif os.path.exists(remote):
                 control.current_track.cuesheet = cuesheet.Cuesheet()
                 control.current_track.cuesheet.open(remote, control.current_track.total_time)
+                control.current_track.artist = control.current_track._get_artist()
+                control.current_track.title = control.current_track._get_title()
                 return True
             else:
                 return False #No cue file exists

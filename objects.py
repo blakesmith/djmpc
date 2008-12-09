@@ -3,16 +3,18 @@ from cuesheet import Index
 class Track(object):
 
     def __init__(self, current_song):
+        self.cuesheet = False
         self.current_song = current_song
         self.title = self._get_title()
         self.artist = self._get_artist()
         self.total_time = self._get_total_time()
         self.update_current_time()
         if "id" in current_song: self.id = current_song['id']
-        self.cuesheet = False
 
     def _get_artist(self):
         """Depending on what ID3 information is available, print the relevant artist name."""
+        if self.has_cuesheet():
+            return self.cuesheet.performer
         if "artist" in self.current_song:
             return self.current_song['artist']
         elif "name" in self.current_song:
@@ -23,6 +25,8 @@ class Track(object):
             return "Nothing is playing."
 
     def _get_title(self):
+        if self.has_cuesheet():
+            return self.cuesheet.title
         if "title" in self.current_song:
             return self.current_song['title']
         else:
