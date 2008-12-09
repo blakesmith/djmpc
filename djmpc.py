@@ -24,6 +24,7 @@ class MpdControl(object):
         self.current_track = False
         self.status_update()
         self.current_track = objects.Track(self.current_song)
+        self.current_track.update_current_time(self.current_status['time'])
         if not self.server_is_stopped():
             cue_control.cue_init()
 
