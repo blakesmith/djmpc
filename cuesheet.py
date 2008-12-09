@@ -23,6 +23,8 @@ class Cuesheet(object):
         except:
             print("Cannot open file, are you sure it's readable?")
         self.num_tracks = self.set_num_tracks()
+        self.performer = self.set_performer()
+        self.title = self.set_title()
         self.parse()
         if total_time:
             self.total_time = total_time
@@ -30,6 +32,12 @@ class Cuesheet(object):
 
     def set_num_tracks(self):
         return len(re.compile(self.cue_re['track']).findall(self.sheet))
+
+    def set_performer(self):
+        return re.compile(self.cue_re['performer']).findall(self.sheet)[0]
+
+    def set_title(self):
+        return re.compile(self.cue_re['title']).findall(self.sheet)[0]
 
     def parse(self):
         self.parsed = []
