@@ -2,7 +2,7 @@ import re
 import os
 import math
 
-class CueRead(object):
+class Cuesheet(object):
     """Main class to use when reading a cuesheet."""
     def __init__(self):
         self.cue_re = {
@@ -12,22 +12,27 @@ class CueRead(object):
             'index': 'INDEX \d{1,3} (\d{1,3}):(\d{1,2}):(\d{1,2})'
             }
 
-    def open(self, filename):
+    def open(self, filename, total_time=False):
         try:
             os.path.exists(filename)
         except:
-            print "File does not exist! Check file path?"
+            print("File does not exist! Check file path?")
         try:
             self.sheet = open(filename).read()
         except:
-            print "Cannot open file, are you sure it's readable?"
+            print("Cannot open file, are you sure it's readable?")
+        self.num_tracks = self.set_num_tracks()
+        self.parse()
+        if total_time:
+            self.total_time = total_time
+            self.append_last_length()
 
-    def num_tracks(self):
+    def set_num_tracks(self):
         return len(re.compile(self.cue_re['track']).findall(self.sheet))
 
     def parse(self):
         self.parsed = []
-        for i in range(self.num_tracks()):
+        for i in range(self.num_tracks):
             self.parsed.append({}) #First append our blank dicts.
         for each_re in self.cue_re.iteritems(): #Loop through all our regexp tests
             reg = re.compile(each_re[1]).findall(self.sheet)
@@ -55,12 +60,17 @@ class CueRead(object):
         sum_total_index = Index([0, 0, 0])
         i = 0
         for index in indices:
-            if i == self.num_tracks() - 1: 
+            if i == self.num_tracks - 1: 
                 break
             preadd_track_index = sum_total_index
             sum_total_index += indices[i+1] - preadd_track_index
             self.parsed[i]['length'] = sum_total_index - preadd_track_index
             i += 1
+
+    def append_last_length(self):
+        """Since cuesheet.py can't provide the length of the last track, deduce it from the length of the song, and append it to the parsed cuesheet."""
+        last_index = self.parsed[self.num_tracks - 1]['index']
+        self.parsed[self.num_tracks - 1]['length'] = self.total_time - last_index
 
 class Index(object):
 
