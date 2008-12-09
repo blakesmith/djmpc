@@ -9,7 +9,7 @@ class Track(object):
         self.total_time = self._get_total_time()
         self.update_current_time()
         if "id" in current_song: self.id = current_song['id']
-        self.cue_parsed = False
+        self.cuesheet = False
 
     def _get_artist(self):
         """Depending on what ID3 information is available, print the relevant artist name."""
@@ -45,7 +45,7 @@ class Track(object):
             return "%s" % self.artist
 
     def has_cuesheet(self):
-        if self.cue_parsed:
+        if self.cuesheet:
             return True
         else:
             return False

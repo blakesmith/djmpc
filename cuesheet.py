@@ -3,7 +3,7 @@ import os
 import math
 
 class Cuesheet(object):
-    """Main class to use when reading a cuesheet."""
+    """Class representing a cuesheet."""
     def __init__(self):
         self.cue_re = {
             'track': 'TRACK (\d{1,3}) AUDIO',
@@ -11,6 +11,7 @@ class Cuesheet(object):
             'title': 'TITLE \"(.*)\"',
             'index': 'INDEX \d{1,3} (\d{1,3}):(\d{1,2}):(\d{1,2})'
             }
+        self.parsed = False
 
     def open(self, filename, total_time=False):
         try:

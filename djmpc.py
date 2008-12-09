@@ -75,7 +75,7 @@ class MpdControl(object):
         """Pretty printout of the current cuesheet. Invoked from the command line using 'cuelist'."""
         self.client_init()
         if cue_control.cue_init():
-            for i in control.current_track.cue_parsed:
+            for i in control.current_track.cuesheet.parsed:
                 print("[%s] %i: %s - %s at %s" % (i['length'], i['track'], i['performer'], i['title'], i['index']))
         else:
             print("No cuesheet found for the current song")
@@ -111,7 +111,7 @@ class MpdControl(object):
                 track_int = int(track_string)
             except:
                 print("Not a valid track number!")
-            for i in control.current_track.cue_parsed:
+            for i in control.current_track.cuesheet.parsed:
                 if i['track'] == int(track_int):
                     self.client.seek(current_id, i['index'].to_seconds()) 
                     display_song_info()
@@ -230,7 +230,6 @@ class CueControl(object):
     """Object to control the functions associated with cuesheet reading."""
 
     def __init__(self):
-        self.cue_lib = cuesheet.CueRead()
         self.music_directory = music_directory
         self.cue_directory = cue_directory
 
@@ -253,25 +252,23 @@ class CueControl(object):
             local = os.path.join(self.music_directory, path)
             remote = os.path.join(self.cue_directory, path)
             if os.path.exists(local):
-                self.cue_lib.open(local)
-                control.current_track.cue_parsed = self.cue_lib.parse()
-                self.append_last_length()
+                control.current_track.cuesheet = cuesheet.Cuesheet()
+                control.current_track.cuesheet.open(local, control.current_track.total_time)
                 return True
             elif os.path.exists(remote):
-                self.cue_lib.open(local)
-                control.current_track.cue_parsed = self.cue_lib.parse()
-                self.append_last_length()
+                control.current_track.cuesheet = cuesheet.Cuesheet()
+                control.current_track.cuesheet.open(remote, control.current_track.total_time)
                 return True
             else:
                 return False #No cue file exists
         else:
-            return True #Cuesheet has already been loaded into control.current_track.cue_parsed
+            return True #Cuesheet has already been loaded into control.current_track.cuesheet.parsed
 
     def cue_update(self):
         """Function to be run every loop to see where the song is in the current cuesheet. Return the relevant information about the current location."""
         if not control.server_is_stopped():
             if control.current_track.has_cuesheet():
-                for i in control.current_track.cue_parsed:
+                for i in control.current_track.cuesheet.parsed:
                     current_index = i['index']
                     if control.current_track.current_time < current_index:
                         break
@@ -280,12 +277,6 @@ class CueControl(object):
                 return cue_info
             else:
                 return "No cue has been loaded yet!"
-
-    def append_last_length(self):
-        """Since cuesheet.py can't provide the length of the last track, deduce it from the length of the song, and append it to the parsed cuesheet."""
-        num_tracks = self.cue_lib.num_tracks()
-        last_index = control.current_track.cue_parsed[num_tracks - 1]['index']
-        control.current_track.cue_parsed[num_tracks - 1]['length'] = control.current_track.total_time - last_index
 
 class CursesControl(object):
 
@@ -322,7 +313,7 @@ class CursesControl(object):
             self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=7, x=0)
             self.progress_bar.update(control.current_track.current_time.percentage(control.current_track.total_time))
             self.body_win = gui.BodyWin(curses, length=self.window_length+1, width=self.window_width, color_pair=1, y=13, x=0)
-            self.body_win.update(song_info.cue_information[0], control.current_track.cue_parsed)
+            self.body_win.update(song_info.cue_information[0], control.current_track.cuesheet.parsed)
             objects.append(self.progress_bar), objects.append(self.cue_progress_bar), objects.append(self.body_win)
         elif not control.current_track.has_cuesheet() and not control.server_is_stopped():
             self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=5, x=0)
@@ -347,7 +338,7 @@ class CursesControl(object):
             elif i == self.cue_progress_bar:
                 self.cue_progress_bar.update(song_info.cue_information[4].percentage(song_info.cue_information[3]))
             elif i == self.body_win:
-                self.body_win.update(song_info.cue_information[0], control.current_track.cue_parsed)
+                self.body_win.update(song_info.cue_information[0], control.current_track.cuesheet.parsed)
             else:
                 i.update()
 
