@@ -335,9 +335,11 @@ class CursesControl(object):
             i.destroy()
             i = False
 
-    def update_gui_objects(self):
-        """Updates all active GUI objects."""
-        for i in self.active_gui_objects:
+    def update_gui_objects(self, object_list=False):
+        """Updates a list GUI objects. If nothing is passed, update all relevant GUI objects."""
+        if not object_list:
+            object_list = self.active_gui_objects
+        for i in object_list:
             if i == self.info_win:
                 self.info_win.update(song_info.gather_song_info())
             elif i == self.progress_bar:
