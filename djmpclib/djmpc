@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
-import mpd
-import cuesheet
-import gui
-import objects
+import djmpclib.mpd as mpd
+import djmpclib.cuesheet as cuesheet
+import djmpclib.gui as gui
+import djmpclib.objects as objects
 import sys
 import os
 import math
 import curses
 import time
-from config import *
+from djmpclib.config import *
 
 MAIN_LOOP_CYCLE_TIME = 2
 
