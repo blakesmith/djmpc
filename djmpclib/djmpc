@@ -9,14 +9,19 @@ import os
 import math
 import curses
 import time
+from djmpclib.exceptions import *
 
 try:
     sys.path.append(os.path.join(os.environ.get('HOME'), '.djmpc'))
     from djmpc_config import *
 except:
-    sys.path.append('/usr/share/djmpc')
-    from djmpc_config import *
+    try:
+        sys.path.append('/usr/share/djmpc')
+        from djmpc_config import *
+    except: 
+        raise ConfigError("Unable to open djmpc_config.py in either '/usr/share/djmpc' or '$HOME/.djmpc'. Are you sure they're present and readable?")
 
+                
 MAIN_LOOP_CYCLE_TIME = 2
 
 class MpdControl(object):
