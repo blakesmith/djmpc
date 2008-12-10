@@ -327,9 +327,11 @@ class CursesControl(object):
         self.active_gui_objects = objects
         return objects
 
-    def destroy_gui_objects(self):
-        """Destroys all relevant GUI objects."""
-        for i in self.active_gui_objects:
+    def destroy_gui_objects(self, object_list=False):
+        """Destroys a list of GUI objects. If nothing is passed, destroy all relevant GUI objects."""
+        if not object_list:
+            object_list = self.active_gui_objects
+        for i in object_list:
             i.destroy()
             i = False
 
