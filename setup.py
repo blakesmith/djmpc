@@ -11,4 +11,5 @@ setup(name='djmpc',
         license='GPLv2',
         packages=['djmpclib'],
         scripts=['djmpclib/djmpc'],
+        data_files=[('share/djmpc', ['djmpclib/config.py'])],
         )
