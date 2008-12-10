@@ -40,7 +40,10 @@ class Track(object):
 
     def update_current_time(self, time_value="0:0"):
         """Takes a string input in the form "34:123", outputs the first number as an integer"""
-        self.current_time = Index(time_value.rsplit(":")[0])
+        try:
+            self.current_time = Index(time_value.rsplit(":")[0])
+        except:
+            self.current_time = Index(time_value)
 
     def get_track_titles(self):
         if self.title:
