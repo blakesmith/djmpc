@@ -9,7 +9,13 @@ import os
 import math
 import curses
 import time
-from djmpclib.config import *
+
+try:
+    sys.path.append(os.path.join(os.environ.get('HOME'), '.djmpc'))
+    from djmpc_config import *
+except:
+    sys.path.append('/usr/share/djmpc')
+    from djmpc_config import *
 
 MAIN_LOOP_CYCLE_TIME = 2
 
