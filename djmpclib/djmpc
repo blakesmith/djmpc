@@ -112,9 +112,9 @@ class MpdControl(object):
             elif len(string_split) > 2:
                 print("Malformed seek time. Try 'minutes:seconds' or just 'seconds'")
         if isinstance(seek_string, int):
-            self.client.seek(current_id, seek_string)
+            self.client.seekid(current_id, seek_string)
         else:
-            self.client.seek(current_id, int_split.to_seconds())
+            self.client.seekid(current_id, int_split.to_seconds())
 
     def cue_seek(self, track_string):
         """Seeks to a track number within a cue."""
@@ -128,7 +128,7 @@ class MpdControl(object):
                 print("Not a valid track number!")
             for i in control.current_track.cuesheet.parsed:
                 if i['track'] == int(track_int):
-                    self.client.seek(current_id, i['index'].to_seconds()) 
+                    self.client.seekid(current_id, i['index'].to_seconds()) 
                     display_song_info()
                     break
         else:
