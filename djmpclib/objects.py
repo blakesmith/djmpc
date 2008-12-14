@@ -3,6 +3,7 @@ from cuesheet import Index
 class Track(object):
 
     def __init__(self, current_song):
+        """Track object should be initialized with the value from MPDClient().currentsong() passed to it for analysis."""
         self.cuesheet = False
         self.current_song = current_song
         self.title = self._get_title()
@@ -12,7 +13,7 @@ class Track(object):
         if "id" in current_song: self.id = current_song['id']
 
     def _get_artist(self):
-        """Depending on what ID3 information is available, print the relevant artist name."""
+        """Depending on what ID3 or cuesheet information is available, print the relevant artist name."""
         if self.has_cuesheet():
             return self.cuesheet.performer
         if "artist" in self.current_song:
@@ -25,6 +26,7 @@ class Track(object):
             return "Nothing is playing."
 
     def _get_title(self):
+        """Depending on what ID3 or cuesheet information is available, print the relevant track name."""
         if self.has_cuesheet():
             return self.cuesheet.title
         if "title" in self.current_song:
@@ -33,6 +35,7 @@ class Track(object):
             return ""
 
     def _get_total_time(self):
+        """Return the total track time."""
         if "time" in self.current_song:
             return Index(self.current_song['time'])
         else:
@@ -46,12 +49,14 @@ class Track(object):
             self.current_time = Index(time_value)
 
     def get_track_titles(self):
+        """Display the relevant artist and track names."""
         if self.title:
             return "%s - %s" % (self.artist, self.title)
         else:
             return "%s" % self.artist
 
     def has_cuesheet(self):
+        """Does the current track have a cuesheet?"""
         if self.cuesheet:
             return True
         else:

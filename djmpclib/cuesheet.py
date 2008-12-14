@@ -14,6 +14,7 @@ class Cuesheet(object):
         self.parsed = False
 
     def open(self, filename, total_time=False):
+        """Open a path to a cuesheet and parse it into the cuesheet object. EG: Cuesheet.open("/home/user/cuesheet.cue")"""
         try:
             os.path.exists(filename)
         except:
@@ -40,6 +41,7 @@ class Cuesheet(object):
         return re.compile(self.cue_re['title']).findall(self.sheet)[0]
 
     def parse(self):
+        """Does the actual regexp processing to store the cuesheet as readable python data."""
         self.parsed = []
         for i in range(self.num_tracks):
             self.parsed.append({}) #First append our blank dicts.
@@ -84,6 +86,7 @@ class Cuesheet(object):
 class Index(object):
 
     def __init__(self, value = None):
+        """Index object can be initialized with a list with length 3 as input: [minutes, seconds, frames], or a integer (Either an actual integer, or even a string that has the ability to be converted to an integer)."""
         self.value = value
         if not self.value == None:
             if isinstance(self.value, str):
@@ -170,6 +173,7 @@ class Index(object):
             return str(in_seconds)
 
     def percentage(self, other):
+        """Return the percentage of time one Index object is over another."""
         first_upper = Index(self.value).to_seconds('float')
         second_upper = other.to_seconds('float')
         if second_upper == 0: # Account for when the track is stopped

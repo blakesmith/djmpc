@@ -12,12 +12,18 @@ class GuiObject(object):
         self.window = curses.newwin(self.window_length, self.window_width, self.y, self.x)
 
     def update(self):
+        """Function that should be called each iteration of the GUI loop to update the information contained in the object."""
         self.window.erase()
         self.window.box()
         self.draw()
         self.window.refresh()
 
+    def draw(self):
+        """Function that does the actual drawing of relevant data to the object."""
+        pass
+
     def destroy(self):
+        """Destroy the object entirely."""
         self.window.erase()
         self.window.refresh()
         self.window = False
