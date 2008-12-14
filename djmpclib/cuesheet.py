@@ -16,6 +16,19 @@ class Cuesheet(object):
             }
         self.parsed = False
 
+    def set_num_tracks(self):
+        return len(re.compile(self.cue_re['track']).findall(self.sheet))
+
+    def set_performer(self):
+        return re.compile(self.cue_re['performer']).findall(self.sheet)[0]
+
+    def set_title(self):
+        return re.compile(self.cue_re['title']).findall(self.sheet)[0]
+
+    def get_cuesheet(self):
+        """Outputs the parsed cuesheet data."""
+        return self.parsed
+
     def open(self, filename, total_time=False):
         """Open a path to a cuesheet and parse it into the cuesheet object. EG: Cuesheet.open("/home/user/cuesheet.cue")"""
         try:
@@ -33,15 +46,6 @@ class Cuesheet(object):
         if total_time:
             self.total_time = total_time
             self.append_last_length()
-
-    def set_num_tracks(self):
-        return len(re.compile(self.cue_re['track']).findall(self.sheet))
-
-    def set_performer(self):
-        return re.compile(self.cue_re['performer']).findall(self.sheet)[0]
-
-    def set_title(self):
-        return re.compile(self.cue_re['title']).findall(self.sheet)[0]
 
     def parse(self):
         """Does the actual regexp processing to store the cuesheet as readable python data."""
