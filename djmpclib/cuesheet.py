@@ -172,7 +172,7 @@ class Index(object):
     def percentage(self, other):
         first_upper = Index(self.value).to_seconds('float')
         second_upper = other.to_seconds('float')
-        if second_upper == 0: # Account for when the track track is stopped
+        if second_upper == 0: # Account for when the track is stopped
             return 0
         else:
             return (first_upper / second_upper) * 100
