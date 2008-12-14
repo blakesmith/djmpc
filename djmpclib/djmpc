@@ -66,7 +66,7 @@ class MpdControl(object):
         try:
             self.client.disconnect()
         except:
-            return "Can't disconnect, are you sure you're connected?"
+            raise ConnectionError("Can't disconnect, are you sure you're connected?")
 
     def client_reconnect(self):
         while not self.status_update():
@@ -84,7 +84,7 @@ class MpdControl(object):
             else:
                 self.client.play()
         except:
-            return "You aren't connected, you must connect first."
+            raise ConnectionError("You aren't connected, you must connect first.")
 
     def cue_list(self):
         """Pretty printout of the current cuesheet. Invoked from the command line using 'cuelist'."""
@@ -110,7 +110,7 @@ class MpdControl(object):
                     int_split.append(int(i))
                 int_split = cuesheet.Index(int_split)
             elif len(string_split) > 2:
-                print("Malformed seek time. Try 'minutes:seconds' or just 'seconds'")
+                raise InputError("Malformed seek time. Try 'minutes:seconds' or just 'seconds'")
         if isinstance(seek_string, int):
             self.client.seekid(current_id, seek_string)
         else:
@@ -143,7 +143,7 @@ class MpdControl(object):
                 self.client.random(1)
             self.client_disconnect()
         except:
-            return "You aren't connected, you must connect first."
+            raise ConnectionError("You aren't connected, you must connect first.")
 
     def repeat(self):
         """Enable or disable repeat."""
@@ -154,7 +154,7 @@ class MpdControl(object):
                 self.client.repeat(1)
             self.client_disconnect()
         except:
-            return "You aren't connected, you must connect first."
+            raise ConnectionError("You aren't connected, you must connect first.")
 
     def setvol(self, vol):
         """Wrapper to set the volume on the server."""
@@ -165,7 +165,7 @@ class MpdControl(object):
             else:
                 self.client.setvol(vol)
         except: 
-            print("Not a valid volume range!")
+            raise InputError("Not a valid volume range!")
 
     def track_has_changed(self):
         """See if the playing track has ended and another has begun."""

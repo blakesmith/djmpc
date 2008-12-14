@@ -2,6 +2,9 @@ import re
 import os
 import math
 
+class FileOpenError(Exception):
+    pass
+
 class Cuesheet(object):
     """Class representing a cuesheet."""
     def __init__(self):
@@ -18,11 +21,11 @@ class Cuesheet(object):
         try:
             os.path.exists(filename)
         except:
-            print("File does not exist! Check file path?")
+            raise FileOpenError("File does not exist! Check file path?")
         try:
             self.sheet = open(filename).read()
         except:
-            print("Cannot open file, are you sure it's readable?")
+            raise FileOpenError("Cannot open file, are you sure it's readable?")
         self.num_tracks = self.set_num_tracks()
         self.performer = self.set_performer()
         self.title = self.set_title()
