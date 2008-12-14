@@ -101,6 +101,8 @@ class MpdControl(object):
         current_id = control.current_track.id
         try:
             seek_string = int(seek_string)
+            if isinstance(seek_string, int):
+                self.client.seekid(current_id, seek_string)
         except:
             string_split = seek_string.rsplit(":")
             if len(string_split) == 2:
@@ -109,12 +111,9 @@ class MpdControl(object):
                 for i in string_split:
                     int_split.append(int(i))
                 int_split = cuesheet.Index(int_split)
-            elif len(string_split) > 2:
+                self.client.seekid(current_id, int_split.to_seconds())
+            else:
                 raise InputError("Malformed seek time. Try 'minutes:seconds' or just 'seconds'")
-        if isinstance(seek_string, int):
-            self.client.seekid(current_id, seek_string)
-        else:
-            self.client.seekid(current_id, int_split.to_seconds())
 
     def cue_seek(self, track_string):
         """Seeks to a track number within a cue."""
