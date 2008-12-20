@@ -88,3 +88,13 @@ class BodyWin(GuiObject):
         self.window.box()
         self.draw()
         self.window.refresh()
+
+class StatusBar(GuiObject):
+
+    def draw(self):
+        self.window.addstr("Status Bar")
+
+    def update(self):
+        self.window.erase()
+        self.draw()
+        self.window.refresh()
