@@ -92,7 +92,7 @@ class BodyWin(GuiObject):
 class StatusBar(GuiObject):
 
     def draw(self):
-        self.window.addstr("Status Bar")
+        self.window.addstr("djmpc")
 
     def update(self):
         self.window.erase()
