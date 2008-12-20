@@ -33,6 +33,7 @@ class MpdControl(object):
     def client_init(self):
         """Things that should be loaded, started or run when the client first starts."""
         self.current_track = False
+        self.active_event_timers = []
         self.status_update()
         self.current_track = objects.Track(self.current_song)
         try:
@@ -44,6 +45,7 @@ class MpdControl(object):
 
     def status_update(self):
         """Current statuses that are updated each iteration of the main loop."""
+        self.event_timer_update()
         try:
             self.current_status = control.client.status()
             self.current_song = self.client.currentsong()
@@ -53,6 +55,17 @@ class MpdControl(object):
         except:
             return False
 
+    def event_timer_update(self):
+        """Updates all active event timers. Executes the callback function if time is up."""
+        if not self.active_event_timers:
+            return False
+        else:
+            for timer in self.active_event_timers:
+                timer.update()
+                if timer.timeleft == 0:
+                    timer.callback()
+                    self.active_event_timers.remove(timer)
+        
     def client_connect(self):
         """Initialize the connection to the server."""
         try:
@@ -381,6 +394,11 @@ class CursesControl(object):
             return "update"
         if char == curses.KEY_RESIZE:
             return "resize"
+        if char == ord('j'):
+            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, control.toggle))
+            return "key_down"
+        if char == ord('k'):
+            return "key_up"
 
 def display_song_info():
     """Pretty output of gather_song_info()."""

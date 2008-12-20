@@ -61,3 +61,18 @@ class Track(object):
             return True
         else:
             return False
+
+class EventTimer(object):
+
+    def __init__(self, seconds, scalar, callback_function=None):
+        self.timeleft = seconds * (10 / scalar)
+        self.scalar = scalar
+        self.callback_function = callback_function
+
+    def update(self):
+        self.timeleft -= self.scalar
+
+    def callback(self):
+        if self.callback_function:
+            self.callback_function()
+
