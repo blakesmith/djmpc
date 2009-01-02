@@ -92,7 +92,8 @@ class BodyWin(GuiObject):
 class StatusBar(GuiObject):
 
     def __init__(self, curses, length, width, color_pair, y, x):
-        self.message = "djmpc"
+        self.default_message = "djmpc"
+        self.message = self.default_message
         GuiObject.__init__(self, curses, length, width, color_pair, y, x)
 
     def draw(self):
