@@ -338,6 +338,9 @@ class CursesControl(object):
         song_info.gather_song_info()
         self.info_win = gui.InfoWin(curses, length=7, width=self.window_width, color_pair=1, y=0, x=0)  
         objects.append(self.info_win)
+        self.status_bar = gui.StatusBar(curses, length=1, width=self.window_width, color_pair=1, y=curses.LINES-1, x=1)
+        objects.append(self.status_bar)
+        self.status_bar.update()
         if control.current_track.has_cuesheet():
             self.cue_progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=1, y=10, x=0)
             self.cue_progress_bar.update(0)
@@ -345,9 +348,6 @@ class CursesControl(object):
             self.progress_bar.update(control.current_track.current_time.percentage(control.current_track.total_time))
             self.body_win = gui.BodyWin(curses, length=self.window_length, width=self.window_width, color_pair=1, y=13, x=0)
             self.body_win.update(song_info.cue_information[0], control.current_track.cuesheet.parsed)
-            self.status_bar = gui.StatusBar(curses, length=1, width=self.window_width, color_pair=1, y=curses.LINES-1, x=1)
-            self.status_bar.update()
-
             objects.append(self.progress_bar), objects.append(self.cue_progress_bar), objects.append(self.body_win), objects.append(self.status_bar)
         elif not control.current_track.has_cuesheet() and not control.server_is_stopped():
             self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=5, x=0)
@@ -398,7 +398,9 @@ class CursesControl(object):
         if char == curses.KEY_RESIZE:
             return "resize"
         if char == ord('j'):
-            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, lambda: control.toggle()))
+            control.toggle()
+            self.status_bar.write("toggle")
+            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, lambda: self.status_bar.write("djmpc")))
             return "key_down"
         if char == ord('k'):
             return "key_up"
