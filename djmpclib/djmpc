@@ -21,7 +21,7 @@ except:
     except: 
         raise ConfigError("Unable to open djmpc_config.py in either '/usr/share/djmpc' or '$HOME/.djmpc'. Are you sure they're present and readable?")
 
-                
+global MAIN_LOOP_CYCLE_TIME               
 MAIN_LOOP_CYCLE_TIME = 2
 
 class MpdControl(object):
