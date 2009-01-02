@@ -398,7 +398,7 @@ class CursesControl(object):
         if char == curses.KEY_RESIZE:
             return "resize"
         if char == ord('j'):
-            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, control.toggle))
+            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, lambda: control.toggle()))
             return "key_down"
         if char == ord('k'):
             return "key_up"
