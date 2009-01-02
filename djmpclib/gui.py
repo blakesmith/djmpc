@@ -106,3 +106,6 @@ class StatusBar(GuiObject):
 
     def write(self, message):
         self.message = message
+
+    def write_default(self):
+        self.message = self.default_message

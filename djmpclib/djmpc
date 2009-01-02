@@ -400,7 +400,7 @@ class CursesControl(object):
         if char == ord('j'):
             control.toggle()
             self.status_bar.write("toggle")
-            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, lambda: self.status_bar.write(self.status_bar.default_message)))
+            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, lambda: self.status_bar.write_default()))
             return "key_down"
         if char == ord('k'):
             return "key_up"
