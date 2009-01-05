@@ -380,6 +380,10 @@ class CursesControl(object):
             else:
                 i.update()
 
+    def resize_window_update(self):
+        self.window_width = curses.COLS
+        self.window_length = curses.LINES - 14
+
     def track_check(self):
         """Things that need to be checked or updated if the track is switched."""
         control.status_update()
@@ -438,7 +442,7 @@ def curses_refresh(curses_control):
     elif user_input == "resize":
         curses.resize_term(*control.stdscr.getmaxyx())
         curses_control.destroy_gui_objects()
-        curses_control = CursesControl()
+        curses_control.resize_window_update()
         curses_control.activate_gui_objects()
         curses_control.update_gui_objects()
 
