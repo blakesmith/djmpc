@@ -320,10 +320,10 @@ class CursesControl(object):
         curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_WHITE)
         self.active_gui_objects = []
-        self.progress_bar = False
-        self.cue_progress_bar = False
-        self.body_win = False
-        self.info_win = False
+        self.progress_bar = None
+        self.cue_progress_bar = None
+        self.body_win = None
+        self.info_win = None
         self.activate_gui_objects()
 
     def status_check(self):
@@ -360,9 +360,9 @@ class CursesControl(object):
         """Destroys a list of GUI objects. If nothing is passed, destroy all relevant GUI objects."""
         if not object_list:
             object_list = self.active_gui_objects
-        for i in object_list:
-            i.destroy()
-            i = False
+        for object in object_list:
+            object.destroy()
+            object = None
 
     def update_gui_objects(self, object_list=False):
         """Updates a list GUI objects. If nothing is passed, update all relevant GUI objects."""
