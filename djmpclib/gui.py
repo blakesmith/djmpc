@@ -88,3 +88,24 @@ class BodyWin(GuiObject):
         self.window.box()
         self.draw()
         self.window.refresh()
+
+class StatusBar(GuiObject):
+
+    def __init__(self, curses, length, width, color_pair, y, x):
+        self.default_message = "djmpc"
+        self.message = self.default_message
+        GuiObject.__init__(self, curses, length, width, color_pair, y, x)
+
+    def draw(self):
+        self.window.addstr(self.message)
+
+    def update(self):
+        self.window.erase()
+        self.draw()
+        self.window.refresh()
+
+    def write(self, message):
+        self.message = message
+
+    def write_default(self):
+        self.message = self.default_message
