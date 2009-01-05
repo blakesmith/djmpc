@@ -4,6 +4,7 @@ REQUIREMENTS
 ============
 
 - Python 2.5 or greater
+- ncurses
 - A working version of mpd
 
 
