@@ -431,29 +431,29 @@ def display_help():
     djmpc volume <num>          Set volume to <num>
     """)
 
-def curses_refresh(curses_control):
+def curses_refresh():
     """Called to refresh/redraw the screen. Needs an instance of CursesControl() passed to update."""
     control.stdscr.refresh()
-    curses_control.status_check()
-    user_input = curses_control.user_input(control.stdscr.getch())
-    curses_control.update_gui_objects()
+    control.curses_control.status_check()
+    user_input = control.curses_control.user_input(control.stdscr.getch())
+    control.curses_control.update_gui_objects()
     if user_input == "quit":
         sys.exit()
     elif user_input == "resize":
         curses.resize_term(*control.stdscr.getmaxyx())
-        curses_control.destroy_gui_objects()
-        curses_control.resize_window_update()
-        curses_control.activate_gui_objects()
-        curses_control.update_gui_objects()
+        control.curses_control.destroy_gui_objects()
+        control.curses_control.resize_window_update()
+        control.curses_control.activate_gui_objects()
+        control.curses_control.update_gui_objects()
 
 
 def curses_gui(stdscr):
     """Main loop for all curses control."""
     control.stdscr = stdscr
     control.client_init()
-    curses_control = CursesControl()
+    control.curses_control = CursesControl()
     while True:
-        curses_refresh(curses_control)
+        curses_refresh()
 
 if __name__ == "__main__":
     try:
