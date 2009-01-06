@@ -1,5 +1,7 @@
 from cuesheet import Index
 
+MAIN_LOOP_CYCLE_TIME = 2
+
 class Track(object):
 
     def __init__(self, current_song):
@@ -64,13 +66,12 @@ class Track(object):
 
 class EventTimer(object):
 
-    def __init__(self, seconds, scalar, callback_function=None):
-        self.timeleft = seconds * (10 / scalar)
-        self.scalar = scalar
+    def __init__(self, callback_function=None, seconds=3,):
+        self.timeleft = seconds * (10 / MAIN_LOOP_CYCLE_TIME)
         self.callback_function = callback_function
 
     def update(self):
-        self.timeleft -= self.scalar
+        self.timeleft -= MAIN_LOOP_CYCLE_TIME
 
     def callback(self):
         if self.callback_function:
