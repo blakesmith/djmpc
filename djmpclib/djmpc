@@ -394,36 +394,31 @@ class CursesControl(object):
         self.activate_gui_objects()
 
     def user_input(self, char):
-        """Handles all user input, and it's associated action. Returns the associated action for the input."""
+        """Handles all user input, and it's associated action."""
         if char == ord('q'):
             sys.exit()
-            return "quit"	
         if char == ord('t'):
             control.toggle()     
             self.status_bar.write("toggle", 'c')
             control.active_event_timers.append(objects.EventTimer(lambda: self.status_bar.write_default()))
-            return "toggle"
         if char == curses.KEY_RIGHT:
             current_volume = int(control.current_status['volume'])
             control.setvol(current_volume+1)
             curses_refresh()
-            return "raise_volume"
         if char == curses.KEY_LEFT:
             current_volume = int(control.current_status['volume'])
             control.setvol(current_volume-1)
             curses_refresh()
-            return "lower_volume"
         if char == curses.KEY_RESIZE:
             curses.resize_term(*control.stdscr.getmaxyx())
             control.curses_control.destroy_gui_objects()
             control.curses_control.resize_window_update()
             control.curses_control.activate_gui_objects()
             control.curses_control.update_gui_objects()
-            return "resize"
         if char == ord('j'):
-            return "key_down"
+            pass
         if char == ord('k'):
-            return "key_up"
+            pass
 
 def display_song_info():
     """Pretty output of gather_song_info()."""
