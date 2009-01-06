@@ -10,7 +10,6 @@ import math
 import curses
 import time
 from djmpclib.exceptions import *
-from djmpclib.objects import MAIN_LOOP_CYCLE_TIME
 
 try:
     sys.path.append(os.path.join(os.environ.get('HOME'), '.djmpc'))
@@ -315,7 +314,7 @@ class CursesControl(object):
         self.window_width = curses.COLS
         self.window_length = curses.LINES - 14
         curses.curs_set(0)
-        curses.halfdelay(MAIN_LOOP_CYCLE_TIME)
+        curses.halfdelay(objects.MAIN_LOOP_CYCLE_TIME)
         curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLUE)
         curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
         curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_WHITE)
