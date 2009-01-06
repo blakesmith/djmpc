@@ -172,8 +172,10 @@ class MpdControl(object):
         """Wrapper to set the volume on the server."""
         try:
             vol = int(vol)
-            if vol < 0 or vol > 100:
-                print("Outside a valid volume range!")
+            if vol < 0: 
+                self.client.setvol(0)
+            if vol > 100:
+                self.client.setvol(100)
             else:
                 self.client.setvol(vol)
         except: 
@@ -400,13 +402,22 @@ class CursesControl(object):
             return "quit"	
         if char == ord('t'):
             control.toggle()     
-            return "update"
+            self.status_bar.write("toggle", 'c')
+            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, lambda: self.status_bar.write_default()))
+            return "toggle"
+        if char == curses.KEY_RIGHT:
+            current_volume = int(control.current_status['volume'])
+            control.setvol(current_volume+1)
+            curses_refresh()
+            return "raise_volume"
+        if char == curses.KEY_LEFT:
+            current_volume = int(control.current_status['volume'])
+            control.setvol(current_volume-1)
+            curses_refresh()
+            return "lower_volume"
         if char == curses.KEY_RESIZE:
             return "resize"
         if char == ord('j'):
-            control.toggle()
-            self.status_bar.write("toggle")
-            control.active_event_timers.append(objects.EventTimer(2, MAIN_LOOP_CYCLE_TIME, lambda: self.status_bar.write_default()))
             return "key_down"
         if char == ord('k'):
             return "key_up"

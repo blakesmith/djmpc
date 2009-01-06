@@ -104,8 +104,16 @@ class StatusBar(GuiObject):
         self.draw()
         self.window.refresh()
 
-    def write(self, message):
-        self.message = message
+    def write(self, message, type=None):
+        if type == None:
+            prefix = ""
+        elif type == 'c':
+            prefix = "Command: "
+        elif type == 'm':
+            prefix = "Message: "
+        elif type == 'e':
+            prefix = "Error: "
+        self.message = prefix + message
 
     def write_default(self):
         self.message = self.default_message
