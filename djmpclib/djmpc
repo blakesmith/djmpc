@@ -399,6 +399,7 @@ class CursesControl(object):
     def user_input(self, char):
         """Handles all user input, and it's associated action. Returns the associated action for the input."""
         if char == ord('q'):
+            sys.exit()
             return "quit"	
         if char == ord('t'):
             control.toggle()     
@@ -416,6 +417,11 @@ class CursesControl(object):
             curses_refresh()
             return "lower_volume"
         if char == curses.KEY_RESIZE:
+            curses.resize_term(*control.stdscr.getmaxyx())
+            control.curses_control.destroy_gui_objects()
+            control.curses_control.resize_window_update()
+            control.curses_control.activate_gui_objects()
+            control.curses_control.update_gui_objects()
             return "resize"
         if char == ord('j'):
             return "key_down"
@@ -450,15 +456,6 @@ def curses_refresh():
     control.curses_control.status_check()
     user_input = control.curses_control.user_input(control.stdscr.getch())
     control.curses_control.update_gui_objects()
-    if user_input == "quit":
-        sys.exit()
-    elif user_input == "resize":
-        curses.resize_term(*control.stdscr.getmaxyx())
-        control.curses_control.destroy_gui_objects()
-        control.curses_control.resize_window_update()
-        control.curses_control.activate_gui_objects()
-        control.curses_control.update_gui_objects()
-
 
 def curses_gui(stdscr):
     """Main loop for all curses control."""
