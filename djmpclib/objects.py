@@ -66,7 +66,7 @@ class Track(object):
 
 class EventTimer(object):
 
-    def __init__(self, callback_function=None, seconds=3,):
+    def __init__(self, callback_function=None, seconds=3):
         self.timeleft = seconds * (10 / MAIN_LOOP_CYCLE_TIME)
         self.callback_function = callback_function
 
