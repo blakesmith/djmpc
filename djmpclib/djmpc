@@ -30,6 +30,7 @@ class MpdControl(object):
     def client_init(self):
         """Things that should be loaded, started or run when the client first starts."""
         self.current_track = False
+        self.event_factory = objects.EventFactory()
         self.status_update()
         self.current_track = objects.Track(self.current_song)
         try:
@@ -440,7 +441,6 @@ def curses_refresh():
 def curses_gui(stdscr):
     """Main loop for all curses control."""
     control.stdscr = stdscr
-    control.event_factory = objects.EventFactory()
     control.client_init()
     control.curses_control = CursesControl()
     while True:
