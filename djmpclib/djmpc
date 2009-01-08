@@ -41,7 +41,7 @@ class MpdControl(object):
 
     def status_update(self):
         """Current statuses that are updated each iteration of the main loop."""
-        control.event_factory.update_all()
+        self.event_factory.update_all()
         try:
             self.current_status = control.client.status()
             self.current_song = self.client.currentsong()
