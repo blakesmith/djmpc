@@ -30,7 +30,6 @@ class MpdControl(object):
     def client_init(self):
         """Things that should be loaded, started or run when the client first starts."""
         self.current_track = False
-        self.active_event_timers = []
         self.status_update()
         self.current_track = objects.Track(self.current_song)
         try:
@@ -42,7 +41,7 @@ class MpdControl(object):
 
     def status_update(self):
         """Current statuses that are updated each iteration of the main loop."""
-        self.event_timer_update()
+        control.event_factory.update_all()
         try:
             self.current_status = control.client.status()
             self.current_song = self.client.currentsong()
@@ -52,21 +51,6 @@ class MpdControl(object):
         except:
             return False
 
-    def event_timer_update(self):
-        """Updates all active event timers. Executes the callback function if time is up."""
-        if not self.active_event_timers:
-            return False
-        else:
-            for timer in self.active_event_timers:
-                timer.update()
-                if timer.timeleft <= 0:
-                    timer.callback()
-                    self.active_event_timers.remove(timer)
-
-    def new_event_timer(self, callback, seconds=3):
-        """Function to add a new timed event (callback) EG - 'control.new_event_timer(lambda: control.toggle())'. Defaults to a 3 second timer."""
-        control.active_event_timers.append(objects.EventTimer(callback, seconds))
-        
     def client_connect(self):
         """Initialize the connection to the server."""
         try:
@@ -404,7 +388,7 @@ class CursesControl(object):
         if char == ord('t'):
             control.toggle()     
             self.status_bar.write("toggle", 'c')
-            control.new_event_timer(lambda: self.status_bar.write_default())
+            control.event_factory.new(lambda: self.status_bar.write_default())
         if char == curses.KEY_RIGHT:
             current_volume = int(control.current_status['volume'])
             control.setvol(current_volume+1)
@@ -456,6 +440,7 @@ def curses_refresh():
 def curses_gui(stdscr):
     """Main loop for all curses control."""
     control.stdscr = stdscr
+    control.event_factory = objects.EventFactory()
     control.client_init()
     control.curses_control = CursesControl()
     while True:

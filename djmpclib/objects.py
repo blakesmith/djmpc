@@ -64,6 +64,26 @@ class Track(object):
         else:
             return False
 
+class EventFactory(object):
+
+    def __init__(self):
+        self.active_event_timers = []
+
+    def new(self, callback, seconds=3):
+        """Function to add a new timed event (callback) EG - 'event_factory.new(lambda: control.toggle())'. Defaults to a 3 second timer."""
+        self.active_event_timers.append(EventTimer(callback, seconds))
+
+    def update_all(self):
+        """Updates all active event timers. Executes the callback function if time is up."""
+        if not self.active_event_timers:
+            return False
+        else:
+            for timer in self.active_event_timers:
+                timer.update()
+                if timer.timeleft <= 0:
+                    timer.callback()
+                    self.active_event_timers.remove(timer)
+
 class EventTimer(object):
 
     def __init__(self, callback_function=None, seconds=3):
