@@ -30,7 +30,7 @@ This lists all the track and index information for the cuesheet on the currently
 
 Seeks to a specific track within the cuesheet. EG - 'djmpc cueseek 24' would seek to the 24th index on the currently playing songs cuesheet.
 
--Ncurses mode:
+- ncurses mode:
 
 A display to output server data, as well as cuesheet/track information. To activate:
 		
