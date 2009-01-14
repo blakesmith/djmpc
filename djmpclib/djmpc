@@ -323,23 +323,23 @@ class CursesControl(object):
         """Initializes all relevant GUI objects"""
         objects = []
         song_info.gather_song_info()
-        self.info_win = gui.InfoWin(curses, length=7, width=self.window_width, color_pair=1, y=0, x=0)  
-        self.status_bar = gui.StatusBar(curses, length=1, width=self.window_width, color_pair=1, y=curses.LINES-1, x=1)
+        self.info_win = gui.InfoWin(length=7, width=self.window_width, color_pair=1, y=0, x=0)  
+        self.status_bar = gui.StatusBar(length=1, width=self.window_width, color_pair=1, y=curses.LINES-1, x=1)
         self.status_bar.update()
         objects.append(self.status_bar)
         objects.append(self.info_win)
         if song_info.current_track.has_cuesheet():
-            self.cue_progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=1, y=10, x=0)
+            self.cue_progress_bar = gui.ProgressBar(length=3, width=self.window_width, color_pair=1, y=10, x=0)
             self.cue_progress_bar.update(0)
-            self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=7, x=0)
+            self.progress_bar = gui.ProgressBar(length=3, width=self.window_width, color_pair=3, y=7, x=0)
             self.progress_bar.update(song_info.current_track.current_time.percentage(song_info.current_track.total_time))
-            self.body_win = gui.BodyWin(curses, length=self.window_length, width=self.window_width, color_pair=1, y=13, x=0)
+            self.body_win = gui.BodyWin(length=self.window_length, width=self.window_width, color_pair=1, y=13, x=0)
             self.body_win.update(song_info.cue_information[0], song_info.current_track.cuesheet.get_cuesheet())
             objects.append(self.progress_bar) 
             objects.append(self.cue_progress_bar) 
             objects.append(self.body_win) 
         elif not song_info.current_track.has_cuesheet() and not control.server_is_stopped():
-            self.progress_bar = gui.ProgressBar(curses, length=3, width=self.window_width, color_pair=3, y=5, x=0)
+            self.progress_bar = gui.ProgressBar(length=3, width=self.window_width, color_pair=3, y=5, x=0)
             self.progress_bar.update(song_info.current_track.current_time.percentage(song_info.current_track.total_time))
             objects.append(self.progress_bar)
         self.active_gui_objects = objects

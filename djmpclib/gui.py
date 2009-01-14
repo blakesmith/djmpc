@@ -1,8 +1,9 @@
+import curses
+
 class GuiObject(object):
     """Abstract GUI object class that all other GUI objects should inherit from."""
 
-    def __init__(self, curses, length, width, color_pair, y, x):
-        self.curses = curses
+    def __init__(self, length, width, color_pair, y, x):
         self.drawn = False
         self.window_width = width
         self.window_length = length
@@ -52,7 +53,7 @@ class ProgressBar(GuiObject):
             self.bar_length = self.window_width - 1
             bar_fill_percentage = (self.percentage / 100.0) * self.bar_length   
             for i in range(int(bar_fill_percentage)):
-                self.window.addstr(1, i+1, " ", self.curses.color_pair(self.color_pair))
+                self.window.addstr(1, i+1, " ", curses.color_pair(self.color_pair))
         except:
             pass
 
@@ -75,7 +76,7 @@ class BodyWin(GuiObject):
             for track, i in zip(self.cue_parsed[(start_position-1)*visible_window:start_position*visible_window], range(visible_window)):
                 cue_string = "[%s] %s - %s" % (track['length'], track['performer'], track['title'])
                 if track['track'] == self.current_track:
-                    self.window.addstr(i+1, 1, cue_string[:self.window_width-2], self.curses.color_pair(2))
+                    self.window.addstr(i+1, 1, cue_string[:self.window_width-2], curses.color_pair(2))
                 else:
                     self.window.addstr(i+1, 1, cue_string[:self.window_width-2])
         except:
@@ -91,10 +92,10 @@ class BodyWin(GuiObject):
 
 class StatusBar(GuiObject):
 
-    def __init__(self, curses, length, width, color_pair, y, x):
+    def __init__(self, length, width, color_pair, y, x):
         self.default_message = "djmpc"
         self.message = self.default_message
-        GuiObject.__init__(self, curses, length, width, color_pair, y, x)
+        GuiObject.__init__(self, length, width, color_pair, y, x)
 
     def draw(self):
         self.window.addstr(self.message)
