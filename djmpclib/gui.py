@@ -5,7 +5,6 @@ class GuiObject(object):
 
     def __init__(self, songinfo, length, width, color_pair, y, x):
         self.song_info = songinfo
-        self.drawn = False
         self.window_width = width
         self.window_length = length
         self.y = y
@@ -35,13 +34,13 @@ class InfoWin(GuiObject):
 
     def draw(self):
         try:
-            for i, j in enumerate(self.song_info):
+            for i, j in enumerate(self.song_lines):
                 self.window.addstr(i, 0, j[:self.window_width])
         except:
             pass
 
-    def update(self, song_info):
-        self.song_info = song_info
+    def update(self):
+        self.song_lines = self.song_info.gather_song_info()
         self.window.erase()
         self.draw()
         self.window.refresh()
@@ -58,12 +57,15 @@ class ProgressBar(GuiObject):
         except:
             pass
 
-    def update(self, percentage=0):
-        self.percentage = percentage
+    def update(self):
+        self.percentage = self.percentage_updater()
         self.window.erase()
         self.window.box()
         self.draw()
         self.window.refresh()
+
+    def attatch_percentage(self, percentage_updater):
+        self.percentage_updater = percentage_updater 
 
 class BodyWin(GuiObject):
     """General body window that can be used to display any sort extra relevant text. Used to display current cuesheet position."""
@@ -83,9 +85,9 @@ class BodyWin(GuiObject):
         except:
             pass
 
-    def update(self, current_track, cue_parsed):
-        self.current_track = current_track
-        self.cue_parsed = cue_parsed
+    def update(self):
+        self.current_track = self.song_info.cue_information[0]
+        self.cue_parsed = self.song_info.current_track.cuesheet.get_cuesheet()
         self.window.erase()
         self.window.box()
         self.draw()
