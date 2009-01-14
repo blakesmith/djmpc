@@ -7,7 +7,7 @@ class Track(object):
     def __init__(self, current_song):
         """Track object should be initialized with the value from MPDClient().currentsong() passed to it for analysis."""
         self.cuesheet = False
-        self.current_song = current_song
+        self.current_song = current_song #mpd.MPDClient.currentsong()
         self.title = self._get_title()
         self.artist = self._get_artist()
         self.total_time = self._get_total_time()
