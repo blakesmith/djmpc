@@ -32,7 +32,7 @@ class MpdControl(object):
         self.current_track = False
         self.event_factory = objects.EventFactory()
         self.status_update()
-        self.current_track = objects.Track(self.current_song)
+        self.current_track = objects.Track(self.client.currentsong())
         try:
             self.current_track.update_current_time(self.current_status['time'])
         except:
@@ -45,7 +45,6 @@ class MpdControl(object):
         self.event_factory.update_all()
         try:
             self.current_status = control.client.status()
-            self.current_song = self.client.currentsong()
             if self.current_track:
                 self.current_track.update_current_time(self.current_status['time'])
             return True
@@ -173,7 +172,7 @@ class MpdControl(object):
             return True
         elif not self.server_is_stopped():
             try:
-                if control.client.currentsong()['file'] == control.current_song['file']:
+                if control.client.currentsong()['file'] == control.current_track.current_song['file']:
                     return False
                 else:
                     return True
@@ -253,7 +252,7 @@ class CueControl(object):
         if not control.server_is_stopped():
             if control.current_track.has_cuesheet(): #Is something loaded into memory?
                 return True
-            if self.cue_load(control.current_song['file']): #Does a cuesheet exist for the currently playing file, if so, is it loaded?
+            if self.cue_load(control.current_track.current_song['file']): #Does a cuesheet exist for the currently playing file, if so, is it loaded?
                 return True
             else:
                 return False
@@ -377,7 +376,7 @@ class CursesControl(object):
     def track_check(self):
         """Things that need to be checked or updated if the track is switched."""
         control.status_update()
-        control.current_track = objects.Track(control.current_song)
+        control.current_track = objects.Track(control.client.currentsong())
         cue_control.cue_init() #Recheck for a new cuesheet
         self.destroy_gui_objects()
         self.activate_gui_objects()
