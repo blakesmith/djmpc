@@ -3,7 +3,7 @@ import curses
 class GuiObject(object):
     """Abstract GUI object class that all other GUI objects should inherit from."""
 
-    def __init__(self, songinfo, length, width, color_pair, y, x):
+    def set_parameters(self, songinfo, length, width, color_pair, y, x):
         self.song_info = songinfo
         self.window_width = width
         self.window_length = length
@@ -48,6 +48,12 @@ class InfoWin(GuiObject):
 class ProgressBar(GuiObject):
     """A percentage progress bar, used to denote song position."""
 
+    def __init__(self, type):
+        if type == 's': #Normal progress bar
+            self.percentage_updater = lambda: self.song_info.current_track.current_time.percentage(self.song_info.current_track.total_time)
+        if type == 'c': #Cuesheet progress bar
+            self.percentage_updater = lambda: self.song_info.cue_information[4].percentage(self.song_info.cue_information[3])
+
     def draw(self):
         try:
             self.bar_length = self.window_width - 1
@@ -63,9 +69,6 @@ class ProgressBar(GuiObject):
         self.window.box()
         self.draw()
         self.window.refresh()
-
-    def attatch_percentage(self, percentage_updater):
-        self.percentage_updater = percentage_updater 
 
 class BodyWin(GuiObject):
     """General body window that can be used to display any sort extra relevant text. Used to display current cuesheet position."""
@@ -95,10 +98,9 @@ class BodyWin(GuiObject):
 
 class StatusBar(GuiObject):
 
-    def __init__(self, songinfo, length, width, color_pair, y, x):
+    def __init__(self):
         self.default_message = "djmpc"
         self.message = self.default_message
-        GuiObject.__init__(self, songinfo, length, width, color_pair, y, x)
 
     def draw(self):
         self.window.addstr(self.message)
