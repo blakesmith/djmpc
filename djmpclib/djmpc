@@ -260,26 +260,27 @@ class CueControl(object):
 
     def cue_load(self, path):
         """Handles the actual file handling of opening and storing the contents of the cuesheet in memory."""
+        def do_load(path):
+            song_info.current_track.cuesheet = cuesheet.Cuesheet()
+            song_info.current_track.cuesheet.open(path, song_info.current_track.total_time)
+            song_info.current_track.artist = song_info.current_track._get_artist()
+            song_info.current_track.title = song_info.current_track._get_title()
+
         if not song_info.current_track.has_cuesheet(): # Has a cuesheet been loaded into memory?
             path = os.path.splitext(path)[0] + ".cue"
             local = os.path.join(self.music_directory, path)
             remote = os.path.join(self.cue_directory, path)
             if os.path.exists(local):
-                song_info.current_track.cuesheet = cuesheet.Cuesheet()
-                song_info.current_track.cuesheet.open(local, song_info.current_track.total_time)
-                song_info.current_track.artist = song_info.current_track._get_artist()
-                song_info.current_track.title = song_info.current_track._get_title()
+                do_load(local)
                 return True
             elif os.path.exists(remote):
-                song_info.current_track.cuesheet = cuesheet.Cuesheet()
-                song_info.current_track.cuesheet.open(remote, song_info.current_track.total_time)
-                song_info.current_track.artist = song_info.current_track._get_artist()
-                song_info.current_track.title = song_info.current_track._get_title()
+                do_load(remote)
                 return True
             else:
                 return False #No cue file exists
         else:
             return True #Cuesheet has already been loaded into song_info.current_track.cuesheet
+
 
     def cue_update(self):
         """Function to be run every loop to see where the song is in the current cuesheet. Return the relevant information about the current location."""
