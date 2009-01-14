@@ -3,7 +3,8 @@ import curses
 class GuiObject(object):
     """Abstract GUI object class that all other GUI objects should inherit from."""
 
-    def __init__(self, length, width, color_pair, y, x):
+    def __init__(self, songinfo, length, width, color_pair, y, x):
+        self.song_info = songinfo
         self.drawn = False
         self.window_width = width
         self.window_length = length
@@ -92,10 +93,10 @@ class BodyWin(GuiObject):
 
 class StatusBar(GuiObject):
 
-    def __init__(self, length, width, color_pair, y, x):
+    def __init__(self, songinfo, length, width, color_pair, y, x):
         self.default_message = "djmpc"
         self.message = self.default_message
-        GuiObject.__init__(self, length, width, color_pair, y, x)
+        GuiObject.__init__(self, songinfo, length, width, color_pair, y, x)
 
     def draw(self):
         self.window.addstr(self.message)
