@@ -1,5 +1,11 @@
 ### djmpc - An ncurses mpd client with cuesheet support.
 
+
+### SCREENSHOTS
+
+![djmpc running in ncurses mode][djmpc-ncurses]
+![djmpc after executing 'djmpc cuelist'][djmpc-cmd]
+
 ### REQUIREMENTS
 
 * Python 2.5 or greater
