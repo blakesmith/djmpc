@@ -56,3 +56,6 @@ Other relevant commands can be seeing by typing:
 djmpc is written by: 
 
 Blake Smith <blakesmith0@gmail.com>
+
+[djmpc-ncurses]: http://github.com/blakesmith/djmpc/raw/9218b31344d46aa9d0720732e8b77075953e2e1b/support/djmpc-ncurses.png "djmpc running in ncurses mode"
+[djmpc-cmd]: http://github.com/blakesmith/djmpc/raw/9218b31344d46aa9d0720732e8b77075953e2e1b/support/djmpc-cmd.png "djmpc after executing 'djmpc cuelist'"
