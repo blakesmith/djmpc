@@ -3,8 +3,8 @@
 
 ### SCREENSHOTS
 
-![djmpc running in ncurses mode][djmpc-ncurses]
-![djmpc after executing 'djmpc cuelist'][djmpc-cmd]
+![djmpc-ncurses] [djmpc-ncurses]
+![djmpc-cmd] [djmpc-cmd]
 
 ### REQUIREMENTS
 
