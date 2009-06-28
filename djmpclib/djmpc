@@ -287,7 +287,7 @@ class CueControl(object):
         if not song_info.current_track.has_cuesheet(): # Has a cuesheet been loaded into memory?
             path = os.path.splitext(path)[0] + ".cue"
             local = os.path.join(self.music_directory, path)
-            remote = os.path.join(self.cue_directory, path)
+            remote = os.path.join(self.cue_directory, os.path.split(path)[1])
             if os.path.exists(local):
                 do_load(local)
                 return True
