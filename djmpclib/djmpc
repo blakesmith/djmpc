@@ -32,10 +32,12 @@ from djmpclib.exceptions import *
 try:
     sys.path.append(os.path.join(os.environ.get('HOME'), '.djmpc'))
     from djmpc_config import *
+    config = DjmpcConfig()
 except:
     try:
         sys.path.append('/usr/share/djmpc')
         from djmpc_config import *
+        config = DjmpcConfig()
     except: 
         raise ConfigError("Unable to open djmpc_config.py in either '/usr/share/djmpc' or '$HOME/.djmpc'. Are you sure they're present and readable?")
 
@@ -71,7 +73,7 @@ class MpdControl(object):
     def client_connect(self):
         """Initialize the connection to the server."""
         try:
-            self.client.connect(mpd_address, mpd_port)
+            self.client.connect(config.mpd_address, config.mpd_port)
             return True
         except:
             return False
@@ -261,8 +263,8 @@ class CueControl(object):
     """Object to control the functions associated with cuesheet reading."""
 
     def __init__(self):
-        self.music_directory = music_directory
-        self.cue_directory = cue_directory
+        self.music_directory = config.music_directory
+        self.cue_directory = config.cue_directory
 
     def cue_init(self):
         """Checks to see if a cuesheet has been loaded into memory already. If no, checks to see if the current track has a cuesheet visible in the filesystem. If so returns True. Otherwise returns false."""
@@ -464,8 +466,8 @@ if __name__ == "__main__":
         song_info = SongInfo()
         sleep_timer = 0
         while not control.client_connect():
-            if sleep_timer > connect_timeout:
-                raise ConnectionError("Timed out trying to connect after %d seconds. Are you sure the server is running?" % connect_timeout)
+            if sleep_timer > config.connect_timeout:
+                raise ConnectionError("Timed out trying to connect after %d seconds. Are you sure the server is running?" % config.connect_timeout)
                 sys.exit()
             else:
                 sleep_timer += 1
