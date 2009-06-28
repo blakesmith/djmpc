@@ -9,3 +9,6 @@ music_directory = "/home/user/.mpd/music"
 
 # If your mpd library isn't available locally, you can specify cue_directory as a local directory where you dump all cuesheets that you want to be loaded even if the server is remote.
 cue_directory = "/home/user/cues/"
+
+#Connection timeout time.
+connect_timeout = 15

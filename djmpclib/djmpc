@@ -377,8 +377,8 @@ class CursesControl(object):
         """Updates a list GUI objects. If nothing is passed, update all relevant GUI objects."""
         if not object_list:
             object_list = self.active_gui_objects
-        for i in object_list:
-            i.update()
+        for object in object_list:
+            object.update()
 
     def resize_window_update(self):
         self.window_width = curses.COLS
@@ -442,7 +442,7 @@ def display_help():
     """)
 
 def curses_refresh():
-    """Called to refresh/redraw the screen. Needs an instance of CursesControl() passed to update."""
+    """Called to refresh/redraw the screen."""
     control.stdscr.refresh()
     control.curses_control.status_check()
     user_input = control.curses_control.user_input(control.stdscr.getch())
@@ -457,12 +457,19 @@ def curses_gui(stdscr):
         curses_refresh()
 
 if __name__ == "__main__":
+    sleep_timer = 0
     try:
         cue_control = CueControl()
         control = MpdControl()
         song_info = SongInfo()
+        sleep_timer = 0
         while not control.client_connect():
-            time.sleep(1)
+            if sleep_timer > connect_timeout:
+                raise ConnectionError("Timed out trying to connect after %d seconds. Are you sure the server is running?" % connect_timeout)
+                sys.exit()
+            else:
+                sleep_timer += 1
+                time.sleep(1)
     except:
         print("Unable to connect to mpd server!")
     if (len(sys.argv) == 1):
