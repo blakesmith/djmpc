@@ -290,11 +290,15 @@ class CueControl(object):
             path = os.path.splitext(path)[0] + ".cue"
             local = os.path.join(self.music_directory, path)
             remote = os.path.join(self.cue_directory, os.path.split(path)[1])
+            any = glob.glob(os.path.join(path, "*.cue"))
             if os.path.exists(local):
                 do_load(local)
                 return True
             elif os.path.exists(remote):
                 do_load(remote)
+                return True
+            elif os.path.exists(any):
+                do_load(any)
                 return True
             else:
                 return False #No cue file exists
