@@ -24,6 +24,7 @@ import djmpclib.gui as gui
 import djmpclib.objects as objects
 import sys
 import os
+import glob
 import math
 import curses
 import time
